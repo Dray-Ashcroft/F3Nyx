@@ -101,6 +101,7 @@ class MainActivity : AppCompatActivity() {
         val sharedContent = handleShareIntent(intent)
         val binaryManager = (application as CrocApp).binaryManager
 
+        com.dking.crocapp.ui.components.UiEffects.load(this)
         setContent {
             val settingsViewModel: SettingsViewModel = viewModel()
             val prefs by settingsViewModel.preferences.collectAsStateWithLifecycle()
@@ -127,6 +128,8 @@ class MainActivity : AppCompatActivity() {
                             settingsViewModel = settingsViewModel,
                             binaryManager = binaryManager
                         )
+                        // Arc reactor boot screen + Jarvis/Friday switch overlay
+                        com.dking.crocapp.ui.components.StarkOverlays()
                     }
                 }
             }
@@ -285,62 +288,23 @@ fun CrocApp(
                 exit = slideOutVertically(tween(PAGE_MS, easing = PageEasing)) { it } +
                         fadeOut(tween(PAGE_MS / 2))
             ) {
-                // Floating liquid-glass pill instead of a flat full-width bar.
-                NavigationBar(
-                    modifier = Modifier
-                        .navigationBarsPadding()
-                        .padding(horizontal = 16.dp, vertical = 10.dp)
-                        .liquidGlass(
-                            shape = NavPillShape,
-                            tint = MaterialTheme.colorScheme.surfaceContainer,
-                            fillAlpha = 0.6f,
-                            shadowElevation = 8.dp
-                        )
-                        .clip(NavPillShape),
-                    containerColor = Color.Transparent,
-                    tonalElevation = 0.dp,
-                    windowInsets = WindowInsets(0, 0, 0, 0)
-                ) {
-                    val shownTab = homeTabs.getOrNull(pagerState.targetPage)
-                    CrocDestination.bottomNavItems.forEach { destination ->
-                        val tab = if (destination == CrocDestination.Send) HomeTab.SEND else HomeTab.RECEIVE
-                        val selected = shownTab == tab
-                        NavigationBarItem(
-                            selected = selected,
-                            onClick = {
-                                val index = homeTabs.indexOf(tab)
-                                if (index >= 0) {
-                                    retryScope.launch {
-                                        pagerState.animateScrollToPage(
-                                            index,
-                                            animationSpec = tween(PAGE_MS, easing = PageEasing)
-                                        )
-                                    }
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    imageVector = if (selected) destination.selectedIcon else destination.unselectedIcon,
-                                    contentDescription = stringResource(destination.labelRes)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(destination.labelRes),
-                                    style = MaterialTheme.typography.labelLarge,
-                                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
-                                )
-                            },
-                            colors = NavigationBarItemDefaults.colors(
-                                selectedIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                                selectedTextColor = MaterialTheme.colorScheme.primary,
-                                indicatorColor = MaterialTheme.colorScheme.primaryContainer,
-                                unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        )
-                    }
-                }
+                // Dock: round glass tabs (left) + the visible screen's main action (right).
+                val shownTab = homeTabs.getOrNull(pagerState.targetPage)
+                com.dking.crocapp.ui.components.HomeDock(
+                    selected = if (shownTab == HomeTab.SEND) 0 else 1,
+                    onSelect = { i ->
+                        val tab = if (i == 0) HomeTab.SEND else HomeTab.RECEIVE
+                        val index = homeTabs.indexOf(tab)
+                        if (index >= 0) {
+                            retryScope.launch {
+                                pagerState.animateScrollToPage(index, animationSpec = tween(PAGE_MS, easing = PageEasing))
+                            }
+                        }
+                    },
+                    transmitLabel = stringResource(R.string.nav_send),
+                    retrieveLabel = stringResource(R.string.nav_receive),
+                    actionKey = if (shownTab == HomeTab.SEND) "send" else "receive"
+                )
             }
         }
     ) { paddingValues ->

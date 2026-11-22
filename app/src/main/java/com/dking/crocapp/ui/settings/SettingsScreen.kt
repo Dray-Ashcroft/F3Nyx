@@ -160,17 +160,10 @@ fun SettingsScreen(
                         modifier = Modifier
                             .size(52.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primaryContainer),
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest),
                         contentAlignment = Alignment.Center
                     ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.croc_icon),
-                            contentDescription = "croc-app icon",
-                            modifier = Modifier
-                                .size(48.dp)
-                                .clip(CircleShape),
-                            tint = Color.Unspecified // 👈 IMPORTANT
-                        )
+                        com.dking.crocapp.ui.components.LogoMark(modifier = Modifier.size(31.dp))
                     }
                     Spacer(modifier = Modifier.width(16.dp))
                     Column {
@@ -210,6 +203,21 @@ fun SettingsScreen(
                     checked = prefs.amoledDark,
                     onCheckedChange = { viewModel.updateAmoledDark(it) }
                 )
+                HorizontalDivider(
+                    modifier = Modifier.padding(vertical = 2.dp),
+                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
+                )
+                run {
+                    val ctx = LocalContext.current
+                    androidx.compose.runtime.LaunchedEffect(Unit) { com.dking.crocapp.ui.components.UiEffects.load(ctx) }
+                    SwitchSetting(
+                        icon = Icons.Rounded.Palette,
+                        label = stringResource(R.string.settings_effects_full),
+                        description = stringResource(R.string.settings_effects_full_desc),
+                        checked = com.dking.crocapp.ui.components.UiEffects.full,
+                        onCheckedChange = { com.dking.crocapp.ui.components.UiEffects.setFull(ctx, it) }
+                    )
+                }
             }
 
             // Language — reads supported locales from locale_config.xml
@@ -792,7 +800,7 @@ fun SettingsScreen(
                             modifier = Modifier.padding(vertical = 2.dp),
                             color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)
                             )
-                        SwitchSetting(
+                        if (com.dking.crocapp.BuildConfig.BUNDLES_LEGACY_ENGINE) SwitchSetting(
                             icon = Icons.Rounded.History,
                             label = stringResource(R.string.settings_try_legacy_first),
                             description = stringResource(R.string.settings_try_legacy_first_desc),

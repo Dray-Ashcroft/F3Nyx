@@ -75,9 +75,9 @@ internal object ReceivedFilePublisher {
         val resolver = application.contentResolver
         val treeDoc = DocumentFile.fromTreeUri(application, treeUri) ?: return null
 
-        // Create croc-received subdirectory inside the user-picked tree
-        var targetDir = treeDoc.findFile("croc-received")
-            ?: treeDoc.createDirectory("croc-received")
+        // Create FeNyx subdirectory inside the user-picked tree
+        var targetDir = treeDoc.findFile("FeNyx")
+            ?: treeDoc.createDirectory("FeNyx")
             ?: return null
 
         // If the file came from a folder transfer, recreate the subdirectory structure
@@ -106,13 +106,13 @@ internal object ReceivedFilePublisher {
 
         return try {
             resolver.openOutputStream(destDoc.uri, "wt")?.use { output ->
-                source.inputStream().use { input -> input.copyTo(output) }
+                source.inputStream().use { input -> input.copyTo(output, 1024 * 1024) }
             } ?: return null
 
             val actualName = destDoc.name ?: source.name
             val displayPath = buildString {
                 treeDoc.name?.let { append("$it/") }
-                append("croc-received/")
+                append("FeNyx/")
                 if (subdir.isNotEmpty()) append("$subdir/")
                 append(actualName)
             }
@@ -131,6 +131,7 @@ internal object ReceivedFilePublisher {
         }
     }
 
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.Q)
     private fun publishToMediaStore(
         application: Application,
         source: File,
@@ -138,12 +139,12 @@ internal object ReceivedFilePublisher {
         conflictStrategy: String
     ): ReceivedFile? {
         val resolver = application.contentResolver
-        // For folder transfers, preserve subdirectory structure under croc-received
+        // For folder transfers, preserve subdirectory structure under FeNyx
         val subdir = relativeSubdir(relativePath)
         val mediaRelativePath = if (subdir.isNotEmpty()) {
-            "${Environment.DIRECTORY_DOWNLOADS}/croc-received/$subdir"
+            "${Environment.DIRECTORY_DOWNLOADS}/FeNyx/$subdir"
         } else {
-            "${Environment.DIRECTORY_DOWNLOADS}/croc-received"
+            "${Environment.DIRECTORY_DOWNLOADS}/FeNyx"
         }
         val formattedPath = if (mediaRelativePath.endsWith("/")) mediaRelativePath else "$mediaRelativePath/"
         val mimeType = URLConnection.guessContentTypeFromName(source.name) ?: "application/octet-stream"
@@ -153,7 +154,7 @@ internal object ReceivedFilePublisher {
             if (existingUri != null) {
                 val overwritten = try {
                     resolver.openOutputStream(existingUri, "wt")?.use { output ->
-                        source.inputStream().use { input -> input.copyTo(output) }
+                        source.inputStream().use { input -> input.copyTo(output, 1024 * 1024) }
                     }
                     true
                 } catch (_: Exception) {
@@ -165,9 +166,9 @@ internal object ReceivedFilePublisher {
 
                 if (overwritten) {
                     val displayLocation = if (subdir.isNotEmpty()) {
-                        "Downloads/croc-received/$subdir/${source.name}"
+                        "Downloads/FeNyx/$subdir/${source.name}"
                     } else {
-                        "Downloads/croc-received/${source.name}"
+                        "Downloads/FeNyx/${source.name}"
                     }
                     return ReceivedFile(
                         name = if (subdir.isNotEmpty()) "$subdir/${source.name}" else source.name,
@@ -181,7 +182,7 @@ internal object ReceivedFilePublisher {
             // Fallback for overwrite: ensure any existing physical file or MediaStore record is removed so (1) is not appended
             try {
                 val publicDownloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                val targetPhysicalFile = File(publicDownloads, if (subdir.isNotEmpty()) "croc-received/$subdir/${source.name}" else "croc-received/${source.name}")
+                val targetPhysicalFile = File(publicDownloads, if (subdir.isNotEmpty()) "FeNyx/$subdir/${source.name}" else "FeNyx/${source.name}")
                 if (targetPhysicalFile.exists()) {
                     targetPhysicalFile.delete()
                 }
@@ -196,7 +197,7 @@ internal object ReceivedFilePublisher {
                 resolver.delete(
                     collection,
                     "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ? COLLATE NOCASE AND ${MediaStore.Files.FileColumns.RELATIVE_PATH} LIKE ?",
-                    arrayOf(source.name, "%croc-received%")
+                    arrayOf(source.name, "%FeNyx%")
                 )
             } catch (_: Exception) {}
         }
@@ -213,7 +214,7 @@ internal object ReceivedFilePublisher {
 
         return try {
             resolver.openOutputStream(insertUri)?.use { output ->
-                source.inputStream().use { input -> input.copyTo(output) }
+                source.inputStream().use { input -> input.copyTo(output, 1024 * 1024) }
             } ?: run {
                 resolver.delete(insertUri, null, null)
                 return null
@@ -226,9 +227,9 @@ internal object ReceivedFilePublisher {
 
             val actualDisplayName = getDisplayNameFromUri(resolver, insertUri) ?: source.name
             val displayLocation = if (subdir.isNotEmpty()) {
-                "Downloads/croc-received/$subdir/$actualDisplayName"
+                "Downloads/FeNyx/$subdir/$actualDisplayName"
             } else {
-                "Downloads/croc-received/$actualDisplayName"
+                "Downloads/FeNyx/$actualDisplayName"
             }
 
             ReceivedFile(
@@ -263,7 +264,7 @@ internal object ReceivedFilePublisher {
 
         val selection = "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ? COLLATE NOCASE AND (${MediaStore.Files.FileColumns.RELATIVE_PATH} LIKE ? OR ${MediaStore.Files.FileColumns.RELATIVE_PATH} LIKE ?)"
         val pathPattern1 = "%${mediaRelativePath.trim('/')}%"
-        val pathPattern2 = "%croc-received%"
+        val pathPattern2 = "%FeNyx%"
         val selectionArgs = arrayOf(displayName, pathPattern1, pathPattern2)
 
         return try {
@@ -306,9 +307,9 @@ internal object ReceivedFilePublisher {
         // For folder transfers, preserve subdirectory structure
         val subdir = relativeSubdir(relativePath)
         val targetDir = if (subdir.isNotEmpty()) {
-            File(downloadsDir, "croc-received/$subdir").apply { mkdirs() }
+            File(downloadsDir, "FeNyx/$subdir").apply { mkdirs() }
         } else {
-            File(downloadsDir, "croc-received").apply { mkdirs() }
+            File(downloadsDir, "FeNyx").apply { mkdirs() }
         }
         val targetFile = if (conflictStrategy == "overwrite") {
             File(targetDir, source.name)
@@ -317,7 +318,8 @@ internal object ReceivedFilePublisher {
         }
 
         return try {
-            source.copyTo(targetFile, overwrite = true)
+            if (targetFile.exists() && conflictStrategy == "overwrite") targetFile.delete()
+            if (!source.renameTo(targetFile)) source.copyTo(targetFile, overwrite = true, bufferSize = 1024 * 1024)
             MediaScannerConnection.scanFile(
                 application,
                 arrayOf(targetFile.absolutePath),

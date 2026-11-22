@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Crovan</string>
+    <string name="app_name">FeNyx</string>
     <!-- ════ Common / General ════ -->
     <string name="action_cancel">रद्द करें</string>
     <string name="action_dismiss">हटाएं</string>
@@ -212,12 +212,12 @@
     <string name="settings_multicast_placeholder">239.255.255.250</string>
     <string name="settings_storage">स्टोरेज</string>
     <string name="settings_receive_location">सेव लोकेशन</string>
-    <string name="settings_receive_location_default">Downloads/croc-received (डिफ़ॉल्ट)</string>
+    <string name="settings_receive_location_default">Downloads/FeNyx (डिफ़ॉल्ट)</string>
     <string name="settings_receive_location_custom">कस्टम फ़ोल्डर</string>
     <string name="settings_choose_folder">फ़ोल्डर चुनें</string>
     <string name="settings_change_folder">बदलें</string>
     <string name="settings_reset_folder">रीसेट करें</string>
-    <string name="settings_receive_location_desc">प्राप्त फ़ाइलें कहाँ सहेजें। डिफ़ॉल्ट है Downloads/croc-received।</string>
+    <string name="settings_receive_location_desc">प्राप्त फ़ाइलें कहाँ सहेजें। डिफ़ॉल्ट है Downloads/FeNyx।</string>
     <string name="settings_about">के बारे में</string>
     <string name="settings_app_version">ऐप वर्शन</string>
     <string name="settings_croc_version">Croc वर्शन</string>

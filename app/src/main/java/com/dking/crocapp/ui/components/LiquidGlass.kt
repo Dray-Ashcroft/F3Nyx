@@ -73,25 +73,25 @@ fun Modifier.liquidGlass(
 
         val baseAlpha = (tint.alpha * fillAlpha).coerceIn(0f, 1f)
         val solid = tint.copy(alpha = 1f)
-        val topColor = lerp(solid, Color.White, if (dark) 0.08f else 0.45f)
+        val topColor = lerp(solid, Color.White, if (dark) 0.03f else 0.45f)
             .copy(alpha = (baseAlpha + 0.12f).coerceAtMost(1f))
         val fill = Brush.verticalGradient(listOf(topColor, solid.copy(alpha = baseAlpha)))
 
         val sheen = Brush.verticalGradient(
-            0f to Color.White.copy(alpha = if (dark) 0.12f else 0.40f),
+            0f to Color.White.copy(alpha = if (dark) 0.04f else 0.40f),
             0.5f to Color.Transparent,
             startY = 0f,
             endY = h
         )
         val caustic = Brush.radialGradient(
-            colors = listOf(Color.White.copy(alpha = if (dark) 0.07f else 0.22f), Color.Transparent),
+            colors = listOf(Color.White.copy(alpha = if (dark) 0.02f else 0.22f), Color.Transparent),
             center = Offset(w * 0.5f, h * 1.05f),
             radius = max(w, h) * 0.6f
         )
         val rim = Brush.linearGradient(
-            0f to Color.White.copy(alpha = if (dark) 0.40f else 0.95f),
-            0.45f to Color.White.copy(alpha = if (dark) 0.06f else 0.25f),
-            1f to Color.White.copy(alpha = if (dark) 0.20f else 0.60f),
+            0f to Color.White.copy(alpha = if (dark) 0.10f else 0.95f),
+            0.45f to Color.White.copy(alpha = if (dark) 0.04f else 0.25f),
+            1f to Color.White.copy(alpha = if (dark) 0.06f else 0.60f),
             start = Offset.Zero,
             end = Offset(w, h)
         )
@@ -174,32 +174,22 @@ fun LiquidBackdrop(modifier: Modifier = Modifier) {
     val cs = MaterialTheme.colorScheme
     val dark = cs.surface.luminance() < 0.5f
     val amoled = cs.background == Color.Black
-    val a = when {
-        amoled -> 0.28f
-        dark -> 0.45f
-        else -> 0.75f
-    }
+    // One faint warm glow at the top of the screen; everything else stays near-black.
+    val glow = if (dark) Color(0xFF2B1311).copy(alpha = if (amoled) 0.7f else 1f) else cs.primaryContainer.copy(alpha = 0.35f)
     val bg = cs.background
-    val c1 = cs.primaryContainer.copy(alpha = a)
-    val c2 = cs.tertiaryContainer.copy(alpha = a)
-    val c3 = cs.secondaryContainer.copy(alpha = a * 0.9f)
 
     Box(
         modifier = modifier.drawBehind {
             val w = size.width
             val h = size.height
             drawRect(bg)
-            fun blob(color: Color, cx: Float, cy: Float, r: Float) {
-                val center = Offset(cx, cy)
-                drawCircle(
-                    brush = Brush.radialGradient(listOf(color, Color.Transparent), center = center, radius = r),
-                    radius = r,
-                    center = center
-                )
-            }
-            blob(c1, w * 0.05f, h * 0.15f, w * 0.95f)
-            blob(c2, w * 1.0f, h * 0.55f, w * 0.85f)
-            blob(c3, w * 0.20f, h * 0.98f, w * 0.95f)
+            val center = Offset(w * 0.5f, -h * 0.08f)
+            val r = maxOf(w, h) * 0.75f
+            drawCircle(
+                brush = Brush.radialGradient(listOf(glow, Color.Transparent), center = center, radius = r),
+                radius = r,
+                center = center
+            )
         }
     )
 }

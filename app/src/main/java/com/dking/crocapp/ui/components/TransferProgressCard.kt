@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Cancel
 import androidx.compose.material.icons.rounded.CheckCircle
+import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.CloudUpload
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Error
@@ -45,7 +46,6 @@ import androidx.compose.ui.unit.dp
 import com.dking.crocapp.R
 import com.dking.crocapp.croc.CrocEngine
 import com.dking.crocapp.croc.CrocTransferState
-import com.dking.crocapp.ui.pairing.CrocPairingAnimation
 
 @Composable
 fun TransferProgressCard(
@@ -59,6 +59,20 @@ fun TransferProgressCard(
 ) {
     val isLegacy = activeEngine == CrocEngine.LEGACY
 
+    // Stealth suit cue once per finished transfer.
+    if (state is CrocTransferState.Completed) {
+        androidx.compose.runtime.LaunchedEffect(state) {
+            SuitCue.play(launch = isSending, source = System.identityHashCode(state))
+        }
+    }
+
+    // Let the header indicator react while a transfer is live.
+    val live = state is CrocTransferState.Preparing || state is CrocTransferState.WaitingForPeer || state is CrocTransferState.Transferring
+    androidx.compose.runtime.DisposableEffect(live) {
+        if (live) TransferActivity.begin()
+        onDispose { if (live) TransferActivity.end() }
+    }
+
     GlassCard(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -70,10 +84,9 @@ fun TransferProgressCard(
             modifier = Modifier.padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            CrocPairingAnimation(state = state)
-
             when (state) {
                 is CrocTransferState.Preparing -> {
+                    ReactorGauge(progress = null, label = "LINKING", modifier = Modifier.align(Alignment.CenterHorizontally))
                     TransferHeader(
                         icon = if (isSending) Icons.Rounded.CloudUpload else Icons.Rounded.Download,
                         iconTint = MaterialTheme.colorScheme.primary,
@@ -82,18 +95,10 @@ fun TransferProgressCard(
                         subtitle = null,
                         showLegacyBadge = isLegacy
                     )
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(6.dp)
-                            .clip(MaterialTheme.shapes.small),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        strokeCap = StrokeCap.Round
-                    )
                 }
 
                 is CrocTransferState.WaitingForPeer -> {
+                    ReactorGauge(progress = null, label = "LINKING", modifier = Modifier.align(Alignment.CenterHorizontally))
                     TransferHeader(
                         icon = if (isSending) Icons.Rounded.CloudUpload else Icons.Rounded.Download,
                         iconTint = MaterialTheme.colorScheme.primary,
@@ -102,22 +107,12 @@ fun TransferProgressCard(
                         subtitle = if (isSending) stringResource(R.string.transfer_share_code_hint) else stringResource(R.string.transfer_verifying_code),
                         showLegacyBadge = isLegacy
                     )
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(6.dp)
-                            .clip(MaterialTheme.shapes.small),
-                        color = MaterialTheme.colorScheme.primary,
-                        trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                        strokeCap = StrokeCap.Round
-                    )
-                    FilledTonalButton(
+                    GlassRoundButton(
+                        icon = Icons.Rounded.Close,
+                        label = stringResource(R.string.action_cancel),
                         onClick = onCancel,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large
-                    ) {
-                        Text(stringResource(R.string.action_cancel))
-                    }
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
                 }
 
                 is CrocTransferState.Transferring -> {
@@ -142,50 +137,40 @@ fun TransferProgressCard(
                         label = "progress"
                     )
 
-                    Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        TransferCrocProgressMarker(
-                            state = state,
-                            progress = animatedProgress
+                    ReactorGauge(
+                        progress = animatedProgress,
+                        label = if (isSending) "TRANSMITTING" else "RETRIEVING",
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        GaugeStat(
+                            label = "Speed",
+                            value = if (state.speedBytesPerSec > 0) formatBytes(state.speedBytesPerSec) + "/s" else "--",
+                            modifier = Modifier.weight(1f)
                         )
-                        LinearProgressIndicator(
-                            progress = { animatedProgress },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(MaterialTheme.shapes.small),
-                            color = MaterialTheme.colorScheme.primary,
-                            trackColor = MaterialTheme.colorScheme.surfaceContainerHighest,
-                            strokeCap = StrokeCap.Round
+                        GaugeStat(
+                            label = if (isSending) "Sent" else "Received",
+                            value = formatBytes(state.bytesTransferred) + " / " + formatBytes(state.totalBytes),
+                            modifier = Modifier.weight(1.4f)
+                        )
+                        GaugeStat(
+                            label = "Left",
+                            value = if (state.etaSeconds > 0) "%02d:%02d".format(state.etaSeconds / 60, state.etaSeconds % 60) else "--",
+                            modifier = Modifier.weight(0.8f)
                         )
                     }
 
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = "${state.progressPercent}%",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = formatBytes(state.bytesTransferred) + " / " + formatBytes(state.totalBytes),
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-
-                    FilledTonalButton(
+                    GlassRoundButton(
+                        icon = Icons.Rounded.Close,
+                        label = stringResource(R.string.action_cancel),
                         onClick = onCancel,
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = MaterialTheme.shapes.large
-                    ) {
-                        Text(stringResource(R.string.action_cancel))
-                    }
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
                 }
 
                 is CrocTransferState.Completed -> {
+                    ReactorGauge(progress = 1f, label = "COMPLETE", complete = true, size = 160.dp, modifier = Modifier.align(Alignment.CenterHorizontally))
                     val count = state.fileCount
                     val subtitle = buildString {
                         append("$count file${if (count != 1) "s" else ""} — ${formatBytes(state.totalBytes)}")
@@ -292,28 +277,6 @@ fun TransferProgressCard(
                 else -> {}
             }
         }
-    }
-}
-
-@Composable
-fun TransferCrocProgressMarker(
-    state: CrocTransferState.Transferring,
-    progress: Float
-) {
-    val p = if (progress.isNaN()) 0f else progress.coerceIn(0f, 1f)
-    BoxWithConstraints(
-        modifier = Modifier.fillMaxWidth().height(28.dp)
-    ) {
-        val markerWidth = 68.dp
-        val travel = (maxWidth - markerWidth).coerceAtLeast(0.dp)
-        CrocPairingAnimation(
-            state = state,
-            modifier = Modifier
-                .align(Alignment.CenterStart)
-                .offset(x = travel * p)
-                .width(markerWidth),
-            compact = true
-        )
     }
 }
 

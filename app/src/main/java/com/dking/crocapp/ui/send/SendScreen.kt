@@ -44,6 +44,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
+import androidx.compose.material.icons.automirrored.rounded.InsertDriveFile
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.Send
@@ -231,6 +234,7 @@ fun SendScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        com.dking.crocapp.ui.components.LogoMark(modifier = Modifier.padding(end = 10.dp).size(28.dp))
                         Text(
                             stringResource(R.string.nav_send),
                             fontWeight = FontWeight.Bold
@@ -240,7 +244,7 @@ fun SendScreen(
                 },
                 actions = {
                     IconButton(onClick = onNavigateToGuide) {
-                        Icon(Icons.Outlined.HelpOutline, contentDescription = stringResource(R.string.guide_title))
+                        Icon(Icons.AutoMirrored.Outlined.HelpOutline, contentDescription = stringResource(R.string.guide_title))
                     }
                     IconButton(onClick = onNavigateToHistory) {
                         Icon(Icons.Outlined.History, contentDescription = stringResource(R.string.nav_history))
@@ -252,14 +256,17 @@ fun SendScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent
-                )
+                ),
+                // The app's outer Scaffold already pads for the status bar.
+                windowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
             )
         },
         bottomBar = {
             // ③ Full-width main action. It sits below the content (never
             // covers it) and is dimmed until there is something to send.
             if (!isTransferActive) {
-                com.dking.crocapp.ui.components.PrimaryActionBar(
+                com.dking.crocapp.ui.components.RegisterDockAction(
+                    key = "send",
                     text = fabLabel,
                     icon = when {
                         isLegacyFallback -> Icons.Rounded.History
@@ -665,10 +672,10 @@ fun SendScreen(
                                     color = MaterialTheme.colorScheme.primary
                                 )
                             }
+                            // Only shown while Legacy is on (tap to go back to Latest).
                             EngineBadge(
                                 engine = uiState.activeEngine,
-                                onClick = if (!isTransferActive) { { viewModel.toggleEngine() } } else null,
-                                showCurrentMode = true
+                                onClick = if (!isTransferActive && uiState.activeEngine == com.dking.crocapp.croc.CrocEngine.LEGACY) { { viewModel.toggleEngine() } } else null
                             )
                         }
                     OutlinedTextField(
@@ -682,8 +689,9 @@ fun SendScreen(
                         // Shown large and readable by default: the sender usually
                         // reads it out or shows it to the receiver.
                         textStyle = MaterialTheme.typography.titleMedium.copy(
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                            fontWeight = FontWeight.SemiBold
+                            fontFamily = com.dking.crocapp.ui.theme.MonoFamily,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.secondary // gold: the thing to share
                         ),
                         visualTransformation = if (hideCodePhrase) PasswordVisualTransformation() else VisualTransformation.None,
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None),
@@ -919,7 +927,7 @@ private fun CompactFileRow(
         horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         Icon(
-            Icons.Rounded.InsertDriveFile,
+            Icons.AutoMirrored.Rounded.InsertDriveFile,
             contentDescription = null,
             modifier = Modifier.size(20.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant
@@ -1670,7 +1678,7 @@ private fun StoreCompletedCard(
                                     modifier = Modifier.size(32.dp)
                                 ) {
                                     Icon(
-                                        Icons.Rounded.OpenInNew,
+                                        Icons.AutoMirrored.Rounded.OpenInNew,
                                         contentDescription = stringResource(R.string.quick_open_url),
                                         modifier = Modifier.size(18.dp),
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant

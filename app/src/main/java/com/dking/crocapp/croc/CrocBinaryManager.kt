@@ -451,6 +451,8 @@ class CrocBinaryManager(private val context: Context) {
         }
     }
 
+    // memfd_create is API 30+; on older Android the NoSuchMethodError below is caught and reported.
+    @android.annotation.SuppressLint("NewApi")
     private fun createMemfd(spec: EngineSpec): FileDescriptor {
         return try {
             Os.memfd_create("croc-${spec.version}", MFD_EXEC)

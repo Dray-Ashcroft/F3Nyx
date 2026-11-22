@@ -547,6 +547,26 @@ class CrocProcess(
         _state.value = CrocTransferState.Idle
     }
 
+    /** Show the "Preparing" state while the app stages large files before croc starts. */
+    fun markPreparing() {
+        _state.value = CrocTransferState.Preparing
+    }
+
+    /** Lite edition has no bundled Legacy engine, so explain instead of offering it. */
+    private fun legacyFallbackOrError(room: String): CrocTransferState =
+        if (com.dking.crocapp.BuildConfig.BUNDLES_LEGACY_ENGINE) {
+            CrocTransferState.LegacyFallbackAvailable(room = room)
+        } else {
+            CrocTransferState.Error(
+                "The other device uses an older croc version. Ask them to update, or use the Standard edition of FeNyx, which includes the Legacy engine."
+            )
+        }
+
+    /** Surface an error from outside the croc process (e.g. staging failed). */
+    fun reportError(message: String) {
+        _state.value = CrocTransferState.Error(message)
+    }
+
     private suspend fun executeWithDnsFallback(
         baseCommand: MutableList<String>,
         workDir: File,
@@ -582,10 +602,7 @@ class CrocProcess(
 
             if (result.isLegacyFallback) {
                 val effectiveRoom = if (!effectiveCode.isNullOrBlank()) effectiveCode else result.announcedCode.ifBlank { "" }
-                _state.value = CrocTransferState.LegacyFallbackAvailable(
-                    room = effectiveRoom,
-                    reason = "The other device is using an older croc version (PAKE protocol version mismatch)."
-                )
+                _state.value = legacyFallbackOrError(effectiveRoom)
                 return
             }
 
@@ -601,10 +618,7 @@ class CrocProcess(
 
                 if (result.isLegacyFallback) {
                     val effectiveRoom = if (!effectiveCode.isNullOrBlank()) effectiveCode else result.announcedCode.ifBlank { "" }
-                    _state.value = CrocTransferState.LegacyFallbackAvailable(
-                        room = effectiveRoom,
-                        reason = "The other device is using an older croc version (PAKE protocol version mismatch)."
-                    )
+                    _state.value = legacyFallbackOrError(effectiveRoom)
                     return
                 }
             }

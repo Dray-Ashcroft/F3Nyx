@@ -1,11 +1,11 @@
 <resources>
-    <string name="app_name">Crovan</string>
+    <string name="app_name">FeNyx</string>
 
     <!-- ════ Common / General ════ -->
     <string name="action_cancel">Cancel</string>
     <string name="action_dismiss">Dismiss</string>
-    <string name="action_send">Send</string>
-    <string name="action_receive">Receive</string>
+    <string name="action_send">Transmit</string>
+    <string name="action_receive">Retrieve</string>
     <string name="action_clear">Clear</string>
     <string name="action_save">Save</string>
     <string name="action_close">Close</string>
@@ -32,14 +32,14 @@
 
     <!-- ════ Navigation ════ -->
     <string name="nav_quick">Quick</string>
-    <string name="nav_send">Send</string>
-    <string name="nav_receive">Receive</string>
+    <string name="nav_send">Transmit</string>
+    <string name="nav_receive">Retrieve</string>
     <string name="nav_history">History</string>
     <string name="nav_settings">Settings</string>
 
     <!-- ════ Quick Screen ════ -->
-    <string name="quick_send_label">Send</string>
-    <string name="quick_receive_label">Receive</string>
+    <string name="quick_send_label">Transmit</string>
+    <string name="quick_receive_label">Retrieve</string>
     <string name="quick_transfer">Quick transfer</string>
     <string name="quick_info_title">About Quick Transfer</string>
     <string name="quick_info_description">Quick Transfer enables fast, encrypted peer-to-peer file sharing using croc.\n\n• Send instantly sends your clipboard text to anyone with the code.\n• Receive uses a secret code to receive files or text.\n\nAll transfers are end-to-end encrypted. Nothing is stored on any server.</string>
@@ -81,7 +81,7 @@
 
     <!-- Quick Progress Labels -->
     <string name="quick_progress_preparing">Preparing</string>
-    <string name="quick_progress_waiting_send">Waiting for a bite…</string>
+    <string name="quick_progress_waiting_send">Waiting for a device</string>
     <string name="quick_progress_waiting_receive">Sniffing for the sender…</string>
     <string name="quick_progress_transferring_send">Live transfer</string>
     <string name="quick_progress_transferring_receive">Saving to Downloads</string>
@@ -96,7 +96,7 @@
     <string name="quick_open_url">Open URL</string>
 
     <!-- ════ Send Screen ════ -->
-    <string name="send_title">Send</string>
+    <string name="send_title">Transmit</string>
     <string name="send_mode_files">Files</string>
     <string name="send_mode_folder">Folder</string>
     <string name="send_mode_text">Text</string>
@@ -113,35 +113,35 @@
     <string name="send_no_folder">No folder selected</string>
     <string name="send_quick_text">Quick Text</string>
     <string name="send_text_placeholder">Text to send</string>
-    <string name="send_secret_code">Secret Code</string>
+    <string name="send_secret_code">Code</string>
     <string name="send_code_placeholder">Secret code</string>
     <string name="send_show_code">Show code</string>
     <string name="send_hide_code">Hide code</string>
     <string name="send_copy_code">Copy code</string>
     <string name="send_share_code">Share code</string>
     <string name="send_regenerate">Regenerate</string>
-    <string name="send_again">Send Again</string>
-    <string name="send_share_code_subject">croc code</string>
+    <string name="send_again">Transmit again</string>
+    <string name="send_share_code_subject">FeNyx code</string>
 
     <!-- ════ Receive Screen ════ -->
-    <string name="receive_title">Receive</string>
-    <string name="receive_again">Receive Again</string>
+    <string name="receive_title">Retrieve</string>
+    <string name="receive_again">Retrieve again</string>
     <string name="receive_secret_code">Secret Code</string>
     <string name="receive_code_placeholder">Enter secret code</string>
     <string name="receive_show_code">Show code</string>
     <string name="receive_hide_code">Hide code</string>
     <string name="receive_paste">Paste</string>
-    <string name="receive_received_files">Received Files</string>
+    <string name="receive_received_files">Retrieved files</string>
     <string name="receive_file_count">%1$d file</string>
     <string name="receive_file_count_plural">%1$d files</string>
-    <string name="receive_received_text">Received Text</string>
+    <string name="receive_received_text">Retrieved text</string>
     <string name="receive_open_url">Open URL</string>
     <string name="receive_copy_text">Copy text</string>
     <string name="receive_open_file">Open</string>
     <string name="receive_share_file">Share</string>
-    <string name="receive_code_share_subject">croc code</string>
+    <string name="receive_code_share_subject">FeNyx code</string>
     <string name="receive_code_share_chooser">Share code</string>
-    <string name="receive_on_code">Receive on Code</string>
+    <string name="receive_on_code">Retrieve on code</string>
 
     <!-- ════ History Screen ════ -->
     <string name="history_title">Recents</string>
@@ -161,19 +161,19 @@
     <string name="history_days_ago">%1$dd ago</string>
 
     <!-- ════ Transfer Progress ════ -->
-    <string name="transfer_preparing_upload">Preparing upload…</string>
-    <string name="transfer_preparing_download">Preparing download…</string>
-    <string name="transfer_waiting_peer">Waiting for a bite…</string>
-    <string name="transfer_connecting">Connecting to sender…</string>
-    <string name="transfer_share_code_hint">Share the code with the receiver</string>
+    <string name="transfer_preparing_upload">Preparing</string>
+    <string name="transfer_preparing_download">Preparing</string>
+    <string name="transfer_waiting_peer">Waiting for a device</string>
+    <string name="transfer_connecting">Connecting…</string>
+    <string name="transfer_share_code_hint">Share this code with the other device</string>
     <string name="transfer_verifying_code">Verifying code phrase…</string>
-    <string name="transfer_uploading">Uploading…</string>
-    <string name="transfer_downloading">Downloading…</string>
-    <string name="transfer_upload_complete">Upload Complete!</string>
-    <string name="transfer_download_complete">Download Complete!</string>
+    <string name="transfer_uploading">Transmitting</string>
+    <string name="transfer_downloading">Retrieving</string>
+    <string name="transfer_upload_complete">Transmitted</string>
+    <string name="transfer_download_complete">Retrieved</string>
     <string name="transfer_file_count_one">%1$d file — %2$s</string>
     <string name="transfer_file_count_many">%1$d files — %2$s</string>
-    <string name="transfer_failed">Transfer Failed</string>
+    <string name="transfer_failed">Couldn\'t complete</string>
     <string name="transfer_cancelled">Transfer Cancelled</string>
 
     <!-- ════ Settings Screen ════ -->
@@ -226,13 +226,13 @@
     <string name="settings_multicast_placeholder">239.255.255.250</string>
 
     <string name="settings_storage">Storage</string>
-    <string name="settings_receive_location">Receive Location</string>
-    <string name="settings_receive_location_default">Downloads/croc-received (default)</string>
+    <string name="settings_receive_location">Save location</string>
+    <string name="settings_receive_location_default">Downloads/FeNyx (default)</string>
     <string name="settings_receive_location_custom">Custom folder</string>
     <string name="settings_choose_folder">Choose Folder</string>
     <string name="settings_change_folder">Change</string>
     <string name="settings_reset_folder">Reset</string>
-    <string name="settings_receive_location_desc">Where received files are saved. Default is Downloads/croc-received.</string>
+    <string name="settings_receive_location_desc">Where received files are saved. Default is Downloads/FeNyx.</string>
 
     <string name="settings_about">About</string>
     <string name="settings_app_version">App Version</string>
@@ -305,10 +305,10 @@
     <string name="quick_more_items_one">+%1$d more item</string>
     <string name="quick_more_items_many">+%1$d more items</string>
     <string name="quick_send_files_label">Send files, text, or receive instantly</string>
-    <string name="quick_hold_receive_hint">Hold Receive for saved codes</string>
+    <string name="quick_hold_receive_hint">Hold Retrieve for saved codes</string>
 
     <!-- ════ Receive Screen - Additional ════ -->
-    <string name="receive_start_receive">Start Receive</string>
+    <string name="receive_start_receive">Retrieve</string>
     <string name="receive_scan_qr">Scan QR</string>
 
     <!-- ════ Receive Screen - Location Picker ════ -->
@@ -342,7 +342,7 @@
     <string name="transfer_legacy_fallback_send_desc">The recipient is using an older croc version (v10 or earlier). You can switch to Legacy Mode to send.</string>
     <string name="transfer_legacy_fallback_receive_desc">The sender is using an older croc version (v10 or earlier). You can Switch to Legacy Mode to receive.</string>
     <string name="action_retry_legacy">Retry (Legacy)</string>
-    <string name="action_send_legacy">Send in Legacy Mode</string>
+    <string name="action_send_legacy">Transmit in Legacy Mode</string>
     <string name="action_switch_legacy_receive">Enter New Code (Legacy Mode)</string>
     <string name="badge_legacy_mode">Legacy</string>
     <string name="badge_current_mode">Latest</string>
@@ -372,7 +372,7 @@
     <string name="settings_disable_multiplexing_desc">Use a single connection stream instead of multi-channel transfers</string>
     <string name="settings_transfer_ports">Transfer Streams / Ports</string>
     <string name="settings_transfer_ports_desc">Number of concurrent ports used when multiplexing is enabled</string>
-    <string name="settings_zip_folder">Zip Folder Before Sending</string>
+    <string name="settings_zip_folder">Zip folders first</string>
     <string name="settings_zip_folder_desc">Compress folders into a single zip archive before sending</string>
     <string name="settings_receive_conflict_strategy">File Conflict Action</string>
     <string name="settings_receive_conflict_strategy_desc">How to handle incoming files that already exist in the destination folder</string>
@@ -444,7 +444,7 @@
     <string name="store_stats_downloads">Downloads</string>
     <string name="store_stats_available">available</string>
     <string name="store_action_copied">Copied</string>
-    <string name="history_badge_received">Received</string>
+    <string name="history_badge_received">Retrieved</string>
     <string name="history_badge_stored">Stored</string>
     <string name="history_file_not_found">File not found on device</string>
     <string name="quick_code_not_set_toast">Please set a default code or quick code in Settings first</string>
@@ -458,13 +458,13 @@
 
     <string name="guide_sec_how_to_use_title">How to use croc</string>
     <string name="guide_sec_how_to_use_subtitle">Step-by-step guide for sending and receiving</string>
-    <string name="guide_how_send_title">Sending Files or Text (Direct)</string>
-    <string name="guide_how_send_step1">1. Open the Send tab, select files/folder or enter text.</string>
-    <string name="guide_how_send_step2">2. Share your 3-word secret code (or show QR code) to the receiver.</string>
-    <string name="guide_how_send_step3">3. Once the receiver enters the code, sending will start automatically.</string>
-    <string name="guide_how_receive_title">Receiving Files (Direct)</string>
-    <string name="guide_how_receive_step1">1. Open the Receive tab and enter the code given by sender, or tap the QR scanner.</string>
-    <string name="guide_how_receive_step2">2. Tap Receive to accept. Files are saved to your chosen download folder configured in Settings.</string>
+    <string name="guide_how_send_title">Transmitting files or text</string>
+    <string name="guide_how_send_step1">1. Open the Transmit tab, select files/folder or enter text.</string>
+    <string name="guide_how_send_step2">2. Share the code (or show the QR) with the other device.</string>
+    <string name="guide_how_send_step3">3. Once the other device enters the code, the transfer starts automatically.</string>
+    <string name="guide_how_receive_title">Retrieving files</string>
+    <string name="guide_how_receive_step1">1. Open the Retrieve tab and enter the code, or tap Scan QR.</string>
+    <string name="guide_how_receive_step2">2. Tap Retrieve. Files are saved to the folder set in Settings.</string>
     <string name="guide_how_store_title">Store Mode (Pickup Anytime)</string>
     <string name="guide_how_store_step1">1. Tap \"Store\" at the bottom of the Send tab. Select lifetime and download limit.</string>
     <string name="guide_how_store_step2">2. Upload files and share the generated getcroc.com download link or CLI token with the receiver.</string>
@@ -533,16 +533,16 @@
 
     <string name="quick_code_auto_set_toast">Set a secret code for you: %s (can be changed in Settings)</string>
     <string name="receive_input_code_dialog_title">Enter Secret Code</string>
-    <string name="receive_input_code_dialog_desc">Enter the secret code phrase from the sender to start receiving.</string>
+    <string name="receive_input_code_dialog_desc">Enter the code from the transmitting device to start.</string>
     <string name="receive_input_code_save_default">Save as default code phrase</string>
 
     <!-- Panel mode (smart panels / tablets) -->
-    <string name="panel_title">Scan to send</string>
-    <string name="panel_subtitle">On your phone: Send → Scan QR → pick a file</string>
+    <string name="panel_title">Scan to transmit</string>
+    <string name="panel_subtitle">On your phone: Transmit → Scan QR → pick a file</string>
     <string name="panel_code_label">Code</string>
-    <string name="panel_waiting">Waiting for a sender…</string>
+    <string name="panel_waiting">Waiting for a device</string>
     <string name="panel_connecting">Getting a new code…</string>
-    <string name="panel_received">Received!</string>
+    <string name="panel_received">Retrieved</string>
     <string name="panel_reconnecting">Connection lost. Getting a new code…</string>
     <string name="panel_new_code_in">New code in %1$d min</string>
     <string name="panel_new_code_now">New code</string>
@@ -555,14 +555,18 @@
     <string name="send_delivery_direct">Direct</string>
     <string name="send_delivery_store">Store</string>
     <string name="action_more_options">More options</string>
-    <string name="receive_scan_sender_qr">Scan sender\'s QR</string>
+    <string name="receive_scan_sender_qr">Scan QR instead</string>
     <string name="receive_or_type">or type the code</string>
-    <string name="receive_hint">Ask the sender for their code or QR to begin</string>
+    <string name="receive_hint">Get the code or QR from the transmitting device</string>
     <string name="receive_clear_all">Clear</string>
-    <string name="mode_meko">Meko</string>
-    <string name="mode_rimas">Rimas</string>
+    <string name="mode_meko">Jarvis · Phone</string>
+    <string name="mode_rimas">Friday · Panel</string>
     <string name="mode_dot_a11y">Mode: %1$s. Hold to switch.</string>
-    <string name="mode_summoned_meko">🐊 Meko is summoned</string>
-    <string name="mode_summoned_rimas">🐊 Rimas is summoned</string>
-    <string name="settings_header_mode">Crovan : %1$s Mode</string>
+    <string name="mode_summoned_meko">Jarvis online</string>
+    <string name="mode_summoned_rimas">Friday online</string>
+    <string name="settings_header_mode">FeNyx · %1$s</string>
+    <string name="settings_effects_full">Full effects</string>
+    <string name="settings_effects_full_desc">Animated mode switch and gauge motion. Turn off for a calmer, faster app.</string>
+    <string name="menu_use_legacy_engine">Use Legacy engine</string>
+    <string name="menu_use_latest_engine">Use Latest engine</string>
 </resources>

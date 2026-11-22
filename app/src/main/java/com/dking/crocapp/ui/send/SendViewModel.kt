@@ -2,7 +2,10 @@ package com.dking.crocapp.ui.send
 
 import android.app.Application
 import android.net.Uri
+import android.os.Environment
+import android.provider.DocumentsContract
 import android.provider.OpenableColumns
+import android.text.format.Formatter
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -18,6 +21,8 @@ import com.dking.crocapp.data.db.TransferType
 import com.dking.crocapp.data.preferences.UserPreferencesRepository
 import com.dking.crocapp.util.QrCodeParser
 import com.dking.crocapp.util.StorageCleaner
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,7 +30,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 
 data class SelectedFile(
     val uri: Uri,
@@ -160,6 +167,17 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun addFolder(treeUri: Uri) {
+        // Copying a large folder on the main thread freezes the app (ANR), so stage it on IO.
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                addFolderBlocking(treeUri)
+            } catch (e: Exception) {
+                crocProcess.reportError("Could not prepare folder: ${e.message ?: "unknown error"}")
+            }
+        }
+    }
+
+    private fun addFolderBlocking(treeUri: Uri) {
         val context = getApplication<CrocApp>()
         val treeDoc = DocumentFile.fromTreeUri(context, treeUri) ?: return
         val folderName = treeDoc.name ?: "folder"
@@ -374,7 +392,7 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
 
             if (isStore) {
                 val filePaths = when (state.sendMode) {
-                    SendMode.FILES -> copyFilesToInternal(state.selectedFiles)
+                    SendMode.FILES -> stageFilesOrReport(state.selectedFiles) ?: return@launch
                     SendMode.FOLDER -> {
                         state.selectedFolderPath?.let { folderPath ->
                             val folder = File(folderPath)
@@ -410,7 +428,7 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
                 }
                 SendMode.FILES -> {
                     if (state.selectedFiles.isNotEmpty()) {
-                        val filePaths = copyFilesToInternal(state.selectedFiles)
+                        val filePaths = stageFilesOrReport(state.selectedFiles) ?: return@launch
                         crocProcess.send(filePaths, state.codePhrase, engine = targetEngine)
                     }
                 }
@@ -462,20 +480,86 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    /**
+     * Prepare files for croc off the main thread. Returns null (and shows an error)
+     * if staging fails, instead of crashing the app.
+     */
+    private suspend fun stageFilesOrReport(files: List<SelectedFile>): List<String>? {
+        crocProcess.markPreparing()
+        return try {
+            withContext(Dispatchers.IO) { copyFilesToInternal(files) }
+        } catch (e: Exception) {
+            StorageCleaner.cleanSendStaging(getApplication<CrocApp>())
+            crocProcess.reportError(e.message ?: "Could not prepare files")
+            null
+        }
+    }
+
     private fun copyFilesToInternal(files: List<SelectedFile>): List<String> {
         val context = getApplication<CrocApp>()
         val sendDir = File(context.cacheDir, "croc-send").apply {
             if (exists()) deleteRecursively()
             mkdirs()
         }
+
+        // Files croc can read directly need no copy (big files: no 2x storage, no wait).
+        val direct = files.associateWith { resolveReadablePath(it) }
+        val toCopy = files.filter { direct[it] == null }
+
+        val needed = toCopy.sumOf { it.size }
+        val free = sendDir.usableSpace
+        val margin = 200L * 1024 * 1024
+        if (needed > 0 && needed + margin > free) {
+            throw IOException(
+                "Not enough free space to prepare the file. Needs " +
+                    Formatter.formatFileSize(context, needed) + ", only " +
+                    Formatter.formatFileSize(context, free) + " free. " +
+                    "Move the file to internal storage (Downloads) or free up space."
+            )
+        }
+
         return files.map { file ->
+            direct[file]?.let { return@map it }
             val dest = File(sendDir, file.name)
-            context.contentResolver.openInputStream(file.uri)?.use { input ->
-                FileOutputStream(dest).use { output ->
-                    input.copyTo(output)
-                }
+            val input = context.contentResolver.openInputStream(file.uri)
+                ?: throw IOException("Cannot open ${file.name}")
+            input.use { inp ->
+                FileOutputStream(dest).use { out -> inp.copyTo(out, 1024 * 1024) }
             }
             dest.absolutePath
+        }
+    }
+
+    /** Best-effort: map a picked content URI to a real file path the app can read. */
+    private fun resolveReadablePath(file: SelectedFile): String? {
+        val context = getApplication<CrocApp>()
+        val uri = file.uri
+        val candidates = mutableListOf<String>()
+        try {
+            if (uri.scheme == "file") uri.path?.let { candidates.add(it) }
+            if (uri.scheme == "content") {
+                if (uri.authority == "com.android.externalstorage.documents" &&
+                    DocumentsContract.isDocumentUri(context, uri)
+                ) {
+                    val parts = DocumentsContract.getDocumentId(uri).split(":", limit = 2)
+                    if (parts.size == 2 && parts[0].equals("primary", ignoreCase = true)) {
+                        @Suppress("DEPRECATION")
+                        candidates.add(File(Environment.getExternalStorageDirectory(), parts[1]).absolutePath)
+                    }
+                }
+                context.contentResolver.query(uri, arrayOf("_data"), null, null, null)?.use { c ->
+                    if (c.moveToFirst()) {
+                        val idx = c.getColumnIndex("_data")
+                        if (idx >= 0) c.getString(idx)?.let { candidates.add(it) }
+                    }
+                }
+            }
+        } catch (_: Exception) { }
+
+        return candidates.firstOrNull { path ->
+            val f = File(path)
+            f.isFile && (file.size <= 0 || f.length() == file.size) &&
+                try { FileInputStream(f).use { it.read() }; true } catch (_: Exception) { false }
         }
     }
 

@@ -188,7 +188,7 @@ The models were posed, darkened and turned into images for the app. See [ASSET_C
 
 | Release | Title | Date |
 |:--|:--|:--|
-| RC V | FeNyx | 22 Nov 2026 |
+| RC V | Ember | 22 Nov 2026 |
 | RC IV | Delta | 27 Oct 2026 |
 | RC III | Triton | 10 Oct 2026 |
 | RC II | Requiem | 1 Oct 2026 |

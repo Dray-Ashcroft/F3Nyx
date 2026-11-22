@@ -18,5 +18,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CrocTransfer"
+rootProject.name = "FeNyx"
 include(":app")

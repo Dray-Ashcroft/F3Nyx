@@ -324,16 +324,10 @@ private fun GuideHeroHeader() {
                 modifier = Modifier
                     .size(44.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.croc_icon),
-                    contentDescription = "croc-app icon",
-                    modifier = Modifier
-                        .size(38.dp)
-                        .clip(CircleShape)
-                )
+                com.dking.crocapp.ui.components.LogoMark(modifier = Modifier.size(26.dp))
             }
             Spacer(modifier = Modifier.width(12.dp))
             Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {

@@ -32,7 +32,7 @@ object StorageCleaner {
 
     /**
      * Cleans up orphaned timestamped folders inside internal app storage staging:
-     * `getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)/croc-received`.
+     * `getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)/FeNyx`.
      *
      * Note: This is internal app staging storage, NOT public storage where completed
      * received files are published.
@@ -41,7 +41,7 @@ object StorageCleaner {
         try {
             val receivedDir = File(
                 context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-                "croc-received"
+                "FeNyx"
             )
             if (receivedDir.exists()) {
                 receivedDir.deleteRecursively()

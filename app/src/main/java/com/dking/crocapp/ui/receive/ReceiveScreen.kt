@@ -31,6 +31,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.InsertDriveFile
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
@@ -184,6 +185,7 @@ fun ReceiveScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        com.dking.crocapp.ui.components.LogoMark(modifier = Modifier.padding(end = 10.dp).size(28.dp))
                         Text(
                             stringResource(R.string.nav_receive),
                             fontWeight = FontWeight.Bold
@@ -202,18 +204,21 @@ fun ReceiveScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent
-                )
+                ),
+                // The app's outer Scaffold already pads for the status bar.
+                windowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
             )
         },
         bottomBar = {
             // ③ Full-width main action (same behaviour as the old floating button:
             // with no code yet it points you to the code field).
             if (!isTransferActive) {
-                com.dking.crocapp.ui.components.PrimaryActionBar(
+                com.dking.crocapp.ui.components.RegisterDockAction(
+                    key = "receive",
                     text = fabLabel,
                     icon = if (isLegacyFallback) Icons.Rounded.History else Icons.Rounded.Download,
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     onClick = {
                         if (isLegacyFallback) {
                             viewModel.retryWithLegacy()
@@ -282,11 +287,7 @@ fun ReceiveScreen(
                                 color = MaterialTheme.colorScheme.tertiary
                             )
                         }
-                        EngineBadge(
-                            engine = uiState.activeEngine,
-                            onClick = if (!isTransferActive) { { viewModel.toggleEngine() } } else null,
-                            showCurrentMode = true
-                        )
+                        EngineBadge(engine = uiState.activeEngine)
                         Box {
                             IconButton(onClick = { showCodeMenu = true }, modifier = Modifier.size(32.dp)) {
                                 Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.action_more_options))
@@ -295,6 +296,17 @@ fun ReceiveScreen(
                                 expanded = showCodeMenu,
                                 onDismissRequest = { showCodeMenu = false }
                             ) {
+                                if (com.dking.crocapp.BuildConfig.BUNDLES_LEGACY_ENGINE) androidx.compose.material3.DropdownMenuItem(
+                                    text = {
+                                        Text(
+                                            if (uiState.activeEngine == com.dking.crocapp.croc.CrocEngine.LEGACY) stringResource(R.string.menu_use_latest_engine)
+                                            else stringResource(R.string.menu_use_legacy_engine)
+                                        )
+                                    },
+                                    enabled = !isTransferActive,
+                                    onClick = { showCodeMenu = false; viewModel.toggleEngine() },
+                                    leadingIcon = { Icon(Icons.Rounded.History, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                )
                                 androidx.compose.material3.DropdownMenuItem(
                                     text = { Text(stringResource(R.string.action_save)) },
                                     enabled = !isTransferActive && uiState.codePhrase.isNotBlank(),
@@ -329,7 +341,12 @@ fun ReceiveScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(52.dp),
-                        shape = MaterialTheme.shapes.large
+                        shape = MaterialTheme.shapes.large,
+                        colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
+                            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.10f),
+                            contentColor = MaterialTheme.colorScheme.secondary
+                        ),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.35f))
                     ) {
                         Icon(Icons.Rounded.QrCodeScanner, contentDescription = null, modifier = Modifier.size(20.dp))
                         Spacer(modifier = Modifier.width(8.dp))
@@ -358,8 +375,8 @@ fun ReceiveScreen(
                         placeholder = { Text(stringResource(R.string.receive_code_placeholder)) },
                         shape = MaterialTheme.shapes.large,
                         textStyle = MaterialTheme.typography.titleMedium.copy(
-                            fontFamily = androidx.compose.ui.text.font.FontFamily.Monospace,
-                            fontWeight = FontWeight.SemiBold
+                            fontFamily = com.dking.crocapp.ui.theme.MonoFamily,
+                            fontWeight = FontWeight.Medium
                         ),
                         visualTransformation = if (hideCodePhrase) PasswordVisualTransformation() else VisualTransformation.None,
                         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.None),
@@ -450,12 +467,13 @@ fun ReceiveScreen(
                             tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = if (uiState.sessionOverrideUri != null) stringResource(R.string.receive_save_to_session)
-                                       else stringResource(R.string.receive_save_to),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            if (uiState.sessionOverrideUri != null) {
+                                Text(
+                                    text = stringResource(R.string.receive_save_to_session),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                             Text(
                                 text = uiState.receiveLocationLabel,
                                 style = MaterialTheme.typography.bodySmall,
@@ -502,8 +520,6 @@ fun ReceiveScreen(
                     horizontalArrangement = Arrangement.Center,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(text = "🐊", style = MaterialTheme.typography.headlineSmall)
-                    Spacer(modifier = Modifier.width(10.dp))
                     Text(
                         text = stringResource(R.string.receive_hint),
                         style = MaterialTheme.typography.bodyMedium,
@@ -705,7 +721,7 @@ internal fun ReceivedFileRow(
             contentAlignment = Alignment.Center
         ) {
             Icon(
-                Icons.Rounded.InsertDriveFile,
+                Icons.AutoMirrored.Rounded.InsertDriveFile,
                 contentDescription = null,
                 modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.onTertiaryContainer

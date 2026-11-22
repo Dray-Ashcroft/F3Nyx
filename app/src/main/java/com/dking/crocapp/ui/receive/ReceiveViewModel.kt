@@ -16,7 +16,9 @@ import com.dking.crocapp.data.db.TransferStatus
 import com.dking.crocapp.data.db.TransferType
 import com.dking.crocapp.data.preferences.UserPreferencesRepository
 import com.dking.crocapp.util.QrCodeParser
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -42,7 +44,7 @@ data class ReceiveUiState(
     val savedCodePhrases: List<String> = emptyList(),
     val receivedFiles: List<ReceivedFile> = emptyList(),
     val sessionOverrideUri: Uri? = null,
-    val receiveLocationLabel: String = "Downloads/croc-received",
+    val receiveLocationLabel: String = "Downloads/FeNyx",
     // ── Panel mode ──
     val panelMode: Boolean = false,
     /** When the current panel code was issued (ms), for the "new code in N min" hint. */
@@ -86,7 +88,14 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
                     // Session override takes priority, then settings, then default
                     val customUri = _uiState.value.sessionOverrideUri
                         ?: prefs.receiveLocationUri.takeIf { it.isNotBlank() }?.let { Uri.parse(it) }
-                    val receivedFiles = publishReceivedFiles(customUri, prefs.receiveConflictStrategy)
+                    // Moving a multi-GB file on the main thread froze/crashed the app; do it on IO.
+                    val receivedFiles = try {
+                        withContext(Dispatchers.IO) {
+                            publishReceivedFiles(customUri, prefs.receiveConflictStrategy)
+                        }
+                    } catch (e: Exception) {
+                        emptyList()
+                    }
                     _uiState.update { it.copy(receivedFiles = receivedFiles) }
                     // Use actual file names for history, not truncated parser names
                     val actualNames = receivedFiles.map { it.name }
@@ -97,7 +106,11 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
                         ),
                         receivedFiles
                     )
-                    currentOutputDir?.deleteRecursively()
+                    // Only clear the temp copy if it was saved; otherwise keep it so nothing is lost.
+                    if (receivedFiles.isNotEmpty()) {
+                        val dir = currentOutputDir
+                        withContext(Dispatchers.IO) { dir?.deleteRecursively() }
+                    }
                     currentOutputDir = null
                 }
             }
@@ -209,7 +222,7 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
             val existingDir = currentOutputDir?.takeIf { it.exists() && it.walkTopDown().any { f -> f.isFile } }
             val outputDir = existingDir ?: File(
                 getApplication<CrocApp>().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-                "croc-received/${System.currentTimeMillis()}"
+                "FeNyx/${System.currentTimeMillis()}"
             ).apply { mkdirs() }
             currentOutputDir = outputDir
 
@@ -396,7 +409,7 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
                 uri.lastPathSegment?.replace(":", "/") ?: "Custom folder"
             } catch (_: Exception) { "Custom folder" }
         } else {
-            "Downloads/croc-received"
+            "Downloads/FeNyx"
         }
     }
 

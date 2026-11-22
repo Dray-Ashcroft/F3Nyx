@@ -10,7 +10,10 @@ val crocLegacySourceDir = rootProject.layout.projectDirectory.dir("third_party/c
 val crocJniLibsRootDir = layout.buildDirectory.dir("generated/jniLibs/croc")
 val crocOutputDir = crocJniLibsRootDir.map { it.dir("arm64-v8a") }
 val crocOutputFile = crocOutputDir.map { it.file("libcroc.so") }
-val crocLegacyOutputFile = crocOutputDir.map { it.file("libcroc_legacy.so") }
+// Legacy engine lives in its own folder so only the Standard edition packages it.
+val crocLegacyJniLibsRootDir = layout.buildDirectory.dir("generated/jniLibs/croc-legacy")
+val crocLegacyOutputDir = crocLegacyJniLibsRootDir.map { it.dir("arm64-v8a") }
+val crocLegacyOutputFile = crocLegacyOutputDir.map { it.file("libcroc_legacy.so") }
 val goTelemetryDir = rootProject.layout.buildDirectory.dir("go/telemetry")
 val goCacheDir = rootProject.layout.buildDirectory.dir("go/cache")
 val goModCacheDir = rootProject.layout.buildDirectory.dir("go/mod-cache")
@@ -87,7 +90,7 @@ val buildCrocLegacyAndroidArm64 by tasks.registering(Exec::class) {
             "Vendored legacy croc dependencies are missing at ${vendorDir.absolutePath}. Run `go mod vendor` in third_party/croc-src-legacy."
         }
 
-        crocOutputDir.get().asFile.mkdirs()
+        crocLegacyOutputDir.get().asFile.mkdirs()
         goTelemetryDir.get().asFile.mkdirs()
         goCacheDir.get().asFile.mkdirs()
         goModCacheDir.get().asFile.mkdirs()
@@ -131,13 +134,32 @@ android {
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.dking.crocapp"
+        applicationId = "com.drayashcroft.fenyx"
         minSdk = 26
         targetSdk = 35
-        versionCode = 12
-        versionName = "6.2.0"
+        versionCode = 15
+        versionName = "7.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // The croc engine is arm64-only, so ship arm64 code only (drops unused x86/armv7 libs).
+        ndk { abiFilters += "arm64-v8a" }
+    }
+
+    // Two editions:
+    //  standard: both engines bundled (works fully offline)
+    //  lite:     Latest engine only; the Legacy engine downloads on first use (~11 MB smaller)
+    flavorDimensions += "edition"
+    productFlavors {
+        create("standard") {
+            dimension = "edition"
+            buildConfigField("boolean", "BUNDLES_LEGACY_ENGINE", "true")
+        }
+        create("lite") {
+            dimension = "edition"
+            versionNameSuffix = "-lite"
+            buildConfigField("boolean", "BUNDLES_LEGACY_ENGINE", "false")
+        }
     }
 
     buildTypes {
@@ -165,6 +187,9 @@ android {
         getByName("main") {
             jniLibs.srcDir(crocJniLibsRootDir)
         }
+        getByName("standard") {
+            jniLibs.srcDir(crocLegacyJniLibsRootDir)
+        }
     }
     packaging {
         jniLibs {
@@ -175,7 +200,11 @@ android {
 }
 
 tasks.matching { it.name == "preBuild" }.configureEach {
-    dependsOn(buildCrocAndroidArm64, buildCrocLegacyAndroidArm64)
+    dependsOn(buildCrocAndroidArm64)
+}
+// Only the Standard edition bundles the Legacy engine.
+tasks.matching { it.name.startsWith("preStandard") && it.name.endsWith("Build") }.configureEach {
+    dependsOn(buildCrocLegacyAndroidArm64)
 }
 
 dependencies {

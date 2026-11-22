@@ -100,6 +100,7 @@ fun PanelReceiveScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        com.dking.crocapp.ui.components.LogoMark(modifier = Modifier.padding(end = 10.dp).size(28.dp))
                         Text(stringResource(R.string.nav_receive), fontWeight = FontWeight.Bold)
                         ModeDot(modifier = Modifier.padding(start = 4.dp))
                     }
@@ -115,7 +116,9 @@ fun PanelReceiveScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent,
                     scrolledContainerColor = Color.Transparent
-                )
+                ),
+                // The app's outer Scaffold already pads for the status bar.
+                windowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
             )
         }
     ) { padding ->
@@ -184,6 +187,9 @@ fun PanelReceiveScreen(
                             )
                         }
                         is CrocTransferState.Completed -> {
+                            androidx.compose.runtime.LaunchedEffect(state) {
+                                com.dking.crocapp.ui.components.SuitCue.play(launch = false, source = System.identityHashCode(state))
+                            }
                             StatusLine(
                                 text = stringResource(R.string.panel_received),
                                 icon = { Icon(Icons.Rounded.CheckCircle, null, tint = MaterialTheme.colorScheme.primary) }

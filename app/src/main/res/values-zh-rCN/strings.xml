@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Crovan</string>
+    <string name="app_name">FeNyx</string>
     <!-- ════ Common / General ════ -->
     <string name="action_cancel">取消</string>
     <string name="action_dismiss">关闭</string>
@@ -212,12 +212,12 @@
     <string name="settings_multicast_placeholder">239.255.255.250</string>
     <string name="settings_storage">存储</string>
     <string name="settings_receive_location">接收位置</string>
-    <string name="settings_receive_location_default">Downloads/croc-received（默认）</string>
+    <string name="settings_receive_location_default">Downloads/FeNyx（默认）</string>
     <string name="settings_receive_location_custom">自定义文件夹</string>
     <string name="settings_choose_folder">选择文件夹</string>
     <string name="settings_change_folder">更改</string>
     <string name="settings_reset_folder">重置</string>
-    <string name="settings_receive_location_desc">接收文件的保存位置。默认为 Downloads/croc-received。</string>
+    <string name="settings_receive_location_desc">接收文件的保存位置。默认为 Downloads/FeNyx。</string>
     <string name="settings_about">关于</string>
     <string name="settings_app_version">应用版本</string>
     <string name="settings_croc_version">Croc 版本</string>
