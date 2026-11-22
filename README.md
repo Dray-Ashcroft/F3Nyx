@@ -1,26 +1,25 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Crovan — Minimalist File Sharing" width="100%">
+  <img src="assets/banner.png" alt="FeNyx — Simple, private file sharing" width="100%">
 </p>
 
-<h1 align="center">🐊 Crovan</h1>
+<h1 align="center">FeNyx</h1>
 
 <p align="center">
-  <strong>Minimalist file sharing across devices.</strong><br>
-  Kotlin · Jetpack Compose · Material 3
+  <em>Send files from one device to another. Simple and private.</em>
 </p>
 
-<p align="center"><a href="https://github.com/Dray-Ashcroft/Crovan/releases"><strong>Download the APK</strong></a></p>
+<p align="center"><a href="https://github.com/Dray-Ashcroft/Crovan/releases"><strong>Download the app</strong></a></p>
 
 <p align="center">
-  <a href="#-about">About</a> ·
-  <a href="#-screenshots">Screenshots</a> ·
-  <a href="#-two-modes">Modes</a> ·
-  <a href="#-features">Features</a> ·
-  <a href="#-whats-new-rc-iv-delta">What's new</a> ·
-  <a href="#-install">Install</a> ·
-  <a href="#%EF%B8%8F-building">Building</a> ·
-  <a href="#-credits">Credits</a> ·
-  <a href="#-license">License</a>
+  <a href="#about">About</a> ·
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#two-modes">Modes</a> ·
+  <a href="#what-it-can-do">Features</a> ·
+  <a href="#which-version-to-download">Versions</a> ·
+  <a href="#install">Install</a> ·
+  <a href="#credits">Credits</a> ·
+  <a href="#releases">Releases</a> ·
+  <a href="#license">License</a>
 </p>
 
 ---
@@ -29,171 +28,179 @@
 
 ---
 
-## ✦ About
+## About
 
-Crovan is an Android app for sending files, folders and text between devices with [croc](https://github.com/schollz/croc). Both sides need only a short code or a QR scan, with no account and no cable, and the transfer is end-to-end encrypted.
+FeNyx lets you send files, folders or text from one phone, tablet or computer to another. The sender gets a short code or a QR code; the receiver types the code or scans the QR, and the file arrives. You don't need an account, a cable or the same Wi-Fi, and only the two devices can see what is sent.
 
-- **Android client for croc**, built on the Android croc client by [Dking08](https://github.com/Dking08)
-- **This fork adds** a new look, a crocodile mascot with animations, and a smart-panel mode for classrooms
-- **Formerly Kroc-Sauria**: renamed to Crovan in RC IV "Delta"
+FeNyx is built on a free tool called [croc](https://github.com/schollz/croc) and on the Android app made by [Dking08](https://github.com/Dking08). It was earlier called Kroc-Sauria and then Crovan.
 
 ---
 
-## 📱 Screenshots
+## Screenshots
 
 <table width="100%">
   <tr>
     <td width="50%" align="center">
-      <img src="Screenshots/Meko.png" alt="Phone mode (Meko): scan the sender's QR or type a code" width="85%">
-      <br><sub><b>Phone mode (Meko)</b></sub>
+      <img src="Screenshots/Jarvis.png" alt="Jarvis mode on a phone" width="85%">
+      <br><sub><b>1 · Jarvis (Phone)</b></sub>
     </td>
     <td width="50%" align="center">
-      <img src="Screenshots/Rimas.png" alt="Panel mode (Rimas): a large, self-refreshing QR code" width="85%">
-      <br><sub><b>Panel mode (Rimas)</b></sub>
+      <img src="Screenshots/Friday.png" alt="Friday mode showing a large QR code" width="85%">
+      <br><sub><b>2 · Friday (Panel)</b></sub>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <img src="Screenshots/Send.png" alt="The Send screen" width="85%">
-      <br><sub><b>Send</b></sub>
+      <img src="Screenshots/Transmit.png" alt="Transmit screen for sending" width="85%">
+      <br><sub><b>3 · Transmit (Send)</b></sub>
     </td>
     <td width="50%" align="center">
-      <img src="Screenshots/Receive.png" alt="The Receive screen" width="85%">
-      <br><sub><b>Receive</b></sub>
+      <img src="Screenshots/Retrieve.png" alt="Retrieve screen for receiving" width="85%">
+      <br><sub><b>4 · Retrieve (Receive)</b></sub>
     </td>
   </tr>
 </table>
 
 ---
 
-## 🔀 Two Modes
+## Two Modes
 
-One app, two modes. A small **mode dot** beside the screen title shows which one is on.
+The app has two modes. The small light next to the title shows which one you are in.
 
-| Mode | For | What it does |
+| Mode | Light colour | Use it on | What it does |
+|:--|:--|:--|:--|
+| **Jarvis** | Blue | Your phone | Send (**Transmit**) and receive (**Retrieve**). Tap the round buttons at the bottom or swipe to switch. |
+| **Friday** | Orange | A tablet or classroom smart board | Only receives. It shows a big QR code so anyone can scan it with their phone and send a file. |
+
+**To change mode:** press and hold the light for one second.
+**Friday's QR code** changes by itself every 10 minutes and after each file, so the code on screen always works.
+**To send to a smart board:** on your phone, open Transmit, tap **Scan panel QR**, then choose the file.
+
+---
+
+## What It Can Do
+
+| Feature | What it means |
+|:--|:--|
+| **Send** | Send files, whole folders, or a piece of text |
+| **Receive** | Scan a QR code or type a code; files are saved in your `Downloads/FeNyx` folder |
+| **Progress ring** | A ring fills up and changes from red to yellow to green as the file moves, with speed and time left |
+| **Big files** | Large files (10 GB and more) send without the app closing |
+| **Send now, collect later** | Upload a locked copy that the other person can download later from a link; delete it any time |
+| **History** | See what you sent and received, and mark favourites |
+| **Share button** | Send straight from your gallery or file manager using Android's Share button |
+| **Finish animation** | A short animation plays when a transfer finishes. Tap to skip, or turn it off in Settings. |
+| **Languages** | English, Español, हिन्दी, 简体中文 and 繁體中文 |
+
+---
+
+## Which Version to Download
+
+| Version | Size | Choose it if |
 |:--|:--|:--|
-| 🟢 **Meko** | Your phone | Full **Send** and **Receive**. Switch between them instantly, or swipe. |
-| 🟣 **Rimas** | A tablet or classroom smart panel | A **receive-only** screen that waits with a large QR code and the code beneath it. Scan it from a phone and send. |
+| **Standard** | about 16 MB | You send to people who may have an older app. It works with old and new versions. |
+| **Lite** | about 12 MB | Everyone has an up-to-date app and you want a smaller download. |
 
-- **Switching mode:** hold the dot for about a second. A single tap does nothing.
-- **Self-refreshing QR:** Rimas gets a fresh code every 10 minutes, after every transfer, and whenever the connection drops, so the QR on screen always works. The screen shows when the next code is due, and the last file received.
-- **Sending to a panel:** on the phone, open Send, tap **Scan panel QR**, then pick a file.
+Both look and work the same. You can install one over the other.
 
 ---
 
-## ✦ Features
+## Install
 
-| | Feature |
-|:-:|:--|
-| 📤 | **Send** files, folders or text (including clipboard text), in clear numbered steps |
-| 📥 | **Receive** by scanning the sender's QR or typing the code; files go to `Downloads/croc-received` unless you choose another folder |
-| 📷 | **QR pairing**: show a QR to send, or scan one to receive. The scanner reads QR codes on screens reliably. |
-| 🗄️ | **Store mode**: upload encrypted files for later pickup (see below) |
-| 🔐 | **Saved code phrases** in Settings |
-| 🕘 | **History** ("Recents") with filters for All, Sent, Received, Stored and Favorites |
-| 🔁 | **Two croc engines**: the latest, plus a legacy one for older croc versions. The app offers legacy mode when it detects an older croc version. |
-| 🌐 | **Transport choice**: Auto (direct, DERP or relay), DERP only, or relay only, with custom relay address and password |
-| 🔗 | **Share sheet** and `croc://` deep links |
-| 📖 | **Guide & Troubleshooting** inside the app |
-| 🌍 | **Languages**: English, Español, हिन्दी, 简体中文 and 繁體中文 |
-| 🎨 | A crocodile mascot that animates while devices pair, and an Android themed icon |
+1. Download the app file (APK) from [Releases](https://github.com/Dray-Ashcroft/Crovan/releases).
+2. Open it on your phone and tap **Install**. If asked, allow installing apps from this source.
 
-### 🗄️ Store Mode
+**Works on:** Android 8 or newer, on most phones made in the last few years. It does not work on very old or 32-bit phones.
 
-Choose **Store** instead of **Direct** on the Send screen to upload an encrypted copy that the receiver can pick up later.
+**Already have Crovan?** FeNyx installs as a new app next to it. You can uninstall Crovan once you no longer need its history.
 
-- Files are encrypted on your device. By default they expire after 24 hours or one verified download; the lifetime and download limit are set in Settings.
-- Share the result as a **browser link**, a **CLI token** (`croc <token>`) or a **QR code**.
-- **Revoke** a stored transfer at any time to delete it from the storage server at once.
-- Uses the croc store at getcroc.com by default; a **custom store URL** can be set. Needs the latest croc engine (v11 or newer).
+<details>
+<summary><b>Why the app asks for permissions</b></summary>
 
-### ⚙️ Advanced Settings
-
-Relay address and password · data transport · PAKE curve · hash algorithm · disable compression · multicast address · receive folder · theme · app language
-
----
-
-## ✦ What's New: RC IV "Delta"
-
-- 🟣 **Rimas panel mode**: a receive-only screen with a large, self-refreshing QR
-- 🟢 **Mode dot**: hold to switch Meko ⇄ Rimas
-- 📷 **Scan the panel's QR** from the Send screen; the scanner reads screens reliably
-- 🧭 **Redesigned Send and Receive** in clear ①②③ steps; Quick mode removed
-- ⚡ **Instant Send ⇄ Receive switching** (swipe too), even on smart panels
-- 🎨 **New name and icon**: Kroc-Sauria is now Crovan
-
----
-
-## 📲 Install
-
-Download the signed APK from [Releases](https://github.com/Dray-Ashcroft/Crovan/releases).
-
-| Requirement | |
+| Permission | Why |
 |:--|:--|
-| Android | 8.0 or newer |
-| Processor | **64-bit ARM (arm64-v8a)**. The croc engine is built for ARM64 only. |
+| Camera | To scan QR codes |
+| Notifications | To show progress and keep sending when the screen is off |
+| Network | To send and receive files |
+| Files and photos | To pick files to send and save files you receive |
 
-**Updating from an older version:** Delta is signed with the same key as Triton.
-
-- **From Triton:** install the Delta APK directly. It updates over Triton and keeps your history and settings.
-- **From Dawn or Requiem:** uninstall the old version first, because the signing key changed in Triton.
-
-**Permissions**
-
-| Permission | Used for |
-|:--|:--|
-| Camera | Scanning QR codes |
-| Notifications and foreground service | Keeping a transfer running and showing its progress |
-| Network, Wi-Fi and multicast state | Transfers and local-network discovery |
-| Storage and media access | Reading files to send and saving received files |
+</details>
 
 ---
 
-## 🛠️ Building
+## For Developers
 
-You need JDK 17, the Go version named in `third_party/croc-src/go.mod`, and Gradle 8.9.
+<details>
+<summary><b>Building the app yourself</b></summary>
+
+You need Java 17, Go (version listed in `third_party/croc-src/go.mod`) and Gradle 8.9. Then run:
 
 ```bash
-gradle assembleDebug
+gradle assembleStandardRelease assembleLiteRelease
 ```
 
-- **Engines:** the croc source is vendored in `third_party/`, with the current engine (`v11.5.2`) and a frozen legacy engine (`v10.6.0`). Both are built into the app for arm64.
-- **CI:** a debug APK is built on every push to `master`. The signed release APK is built by hand from the Actions tab.
-- **Croc updates:** a weekly workflow checks for a new croc release and updates the vendored source.
-- **Reproducible build:** the `reproducible-build/` folder has a Docker setup that mirrors F-Droid's build server.
+- The croc source code is kept in `third_party/`: the current version (11.5.2) and an older one (10.6.0) used only in Standard.
+- A test build is made automatically on every update to `master`. Release builds are started by hand from the Actions tab.
+- A weekly check updates croc when a new version comes out.
 
-Contributions are welcome; please read [CONTRIBUTING.md](CONTRIBUTING.md) first. Translations are managed through Crowdin.
+Please read [CONTRIBUTING.md](CONTRIBUTING.md) before contributing. Translations are done on Crowdin.
+
+</details>
 
 ---
 
-## ⚙️ Technology
+## Credits
 
-| | |
+| Contributor | Role |
 |:--|:--|
-| **UI** | Kotlin · Jetpack Compose · Material 3 |
-| **App** | Room (history) · DataStore (settings) · CameraX and ZXing (QR) |
-| **Engine** | croc, written in Go |
-| **Source** | GitHub · Codeberg |
-| **Implementation** | Claude Opus 5.5 · OpenAI GPT 5.7 Luna |
+| Sai Prasad, M.Sc. Agri. Entomology, ASRB NET | Project Designer |
+| Claude Opus 5.5 | Development |
+| OpenAI Astra 6 | Image Generation |
+| Dastageer Siddiqui ([Dking08](https://github.com/Dking08)) | Original Android app |
+| [schollz](https://github.com/schollz/croc) | croc, the tool that does the sending |
+
+<details>
+<summary><b>3D models</b></summary>
+
+| Used for | Model | Creator | Licence |
+|:--|:--|:--|:--|
+| Finish animation | [Iron Man stealth suit (Textured)(Rigged)](https://skfb.ly/oGIAu) | 3D MODELS | CC BY 4.0 |
+| Mode-change rings | HUD | anuhya | CC BY 4.0 |
+
+The models were posed, darkened and turned into images for the app. See [ASSET_CREDITS.md](ASSET_CREDITS.md).
+
+</details>
+
+<details>
+<summary><b>Other software and fonts</b></summary>
+
+| Component | Licence |
+|:--|:--|
+| croc and the tools it uses | MIT and BSD 3-Clause |
+| Inter and JetBrains Mono fonts | SIL OFL 1.1 |
+| Android libraries and ZXing (QR scanner) | Apache 2.0 |
+
+</details>
 
 ---
 
-## ✦ Credits
+## Releases
 
-- **Croc engine**: [schollz](https://github.com/schollz/croc) (MIT licence)
-- **Original Android client**: Dastageer Siddiqui ([Dking08](https://github.com/Dking08))
-- **Crovan design & animation**: this fork
-- **Third-party code** in the croc engine, such as Tailcat and tailscale.com (BSD 3-Clause): see `third_party/croc-src/THIRD_PARTY_NOTICES.md`
-
----
-
-## 📜 License
-
-Crovan is licensed under the **GNU General Public License v3.0** (see [LICENSE](LICENSE)). The bundled croc source in `third_party/` keeps its own **MIT** licence.
+| Release | Title | Date |
+|:--|:--|:--|
+| RC V | FeNyx | 22 Nov 2026 |
+| RC IV | Delta | 27 Oct 2026 |
+| RC III | Triton | 10 Oct 2026 |
+| RC II | Requiem | 1 Oct 2026 |
+| RC I | Dawn | 1 Oct 2026 |
 
 ---
+
+## License
+
+FeNyx is free and open source under the **GNU GPL v3.0** (see [LICENSE](LICENSE)). The croc code in `third_party/` uses the **MIT** licence.
 
 <p align="center">
-  <strong>Crovan 🐊</strong><br>
-  <sub>Forked from the Android Croc client · Powered by croc</sub>
+  <sub>Built on the Android croc app · Powered by croc</sub><br>
+  <sub>GitHub · Codeberg</sub>
 </p>
