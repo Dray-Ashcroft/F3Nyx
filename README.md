@@ -2,16 +2,26 @@
   <img src="assets/banner.png" alt="F3Nyx — Simple, private file sharing" width="100%">
 </p>
 
-<h1 align="center">F3Nyx</h1>
+<h1 align="center">F3Nyx (Phoenix)</h1>
 
 <p align="center">
   <em>Send files from one device to another. Simple and private.</em>
 </p>
 
-<p align="center"><a href="https://github.com/Dray-Ashcroft/F3Nyx/releases"><strong>Download the app</strong></a></p>
+<p align="center">
+  <a href="https://github.com/Dray-Ashcroft/F3Nyx/releases/latest"><img src="https://img.shields.io/github/v/release/Dray-Ashcroft/F3Nyx?style=for-the-badge&label=Release&color=E5484D&labelColor=0E0E10" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/Android-8.0%2B-E2B33C?style=for-the-badge&labelColor=0E0E10&logo=android&logoColor=white" alt="Android 8.0 or newer">
+  <img src="https://img.shields.io/badge/Encryption-End--to--end-38BDF8?style=for-the-badge&labelColor=0E0E10" alt="End-to-end encrypted">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-A0A0A8?style=for-the-badge&labelColor=0E0E10" alt="GPL-3.0 licence"></a>
+</p>
+
+<p align="center">
+  <a href="https://github.com/Dray-Ashcroft/F3Nyx/releases/latest"><strong>Download the app</strong></a>
+</p>
 
 <p align="center">
   <a href="#about">About</a> ·
+  <a href="#how-it-works">How it works</a> ·
   <a href="#screenshots">Screenshots</a> ·
   <a href="#two-layouts">Layouts</a> ·
   <a href="#what-it-can-do">Features</a> ·
@@ -32,7 +42,40 @@
 
 F3Nyx lets you send files, folders or text from one phone, tablet or computer to another. The sender gets a short code or a QR code; the receiver types the code or scans the QR, and the file arrives. You don't need an account, a cable or the same Wi-Fi, and only the two devices can see what is sent.
 
-F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and on the Android app made by [Dking08](https://github.com/Dking08). It was earlier called Kroc-Sauria and then Crovan.
+F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and on the Android app made by [Dking08](https://github.com/Dking08). It rose from Kroc-Sauria and Crovan, hence the name: a phoenix.
+
+<table width="100%">
+  <tr>
+    <td width="25%" align="center"><h3>0</h3><sub>accounts needed</sub></td>
+    <td width="25%" align="center"><h3>10 GB+</h3><sub>files, without crashing</sub></td>
+    <td width="25%" align="center"><h3>2</h3><sub>layouts: phone and smart board</sub></td>
+    <td width="25%" align="center"><h3>5</h3><sub>languages</sub></td>
+  </tr>
+</table>
+
+---
+
+## How It Works
+
+<table width="100%">
+  <tr>
+    <td width="33%" align="center">
+      <h3>01</h3>
+      <b>Pick</b><br>
+      <sub>Choose files, a folder or text on the sending device</sub>
+    </td>
+    <td width="33%" align="center">
+      <h3>02</h3>
+      <b>Share the code</b><br>
+      <sub>Show the QR or read out the short code</sub>
+    </td>
+    <td width="33%" align="center">
+      <h3>03</h3>
+      <b>Receive</b><br>
+      <sub>Scan or type it on the other device. Done.</sub>
+    </td>
+  </tr>
+</table>
 
 ---
 
@@ -65,14 +108,23 @@ F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and
 
 ## Two Layouts
 
-The app has two layouts. A small switch in the centre of the top bar, with a phone icon and a panel icon, shows which one you are in.
+A small switch in the centre of the top bar, with a phone icon and a panel icon, shows which layout you are in. Tap the other icon to change it.
 
-| Layout | Use it on | What it does |
-|:--|:--|:--|
-| **Phone** | Your phone | Send (**Transmit**) and receive (**Retrieve**). Tap the round buttons at the bottom or swipe to switch. |
-| **Panel** | A tablet or classroom smart board | Only receives. It shows a big QR code so anyone can scan it with their phone and send a file. |
+<table width="100%">
+  <tr>
+    <td width="50%" valign="top">
+      <h3>Phone</h3>
+      <sub>FOR YOUR PHONE</sub>
+      <p>Send (<b>Transmit</b>) and receive (<b>Retrieve</b>). Tap the round buttons at the bottom or swipe to switch. Pick files, a folder or text with three small icons.</p>
+    </td>
+    <td width="50%" valign="top">
+      <h3>Panel</h3>
+      <sub>FOR A TABLET OR CLASSROOM SMART BOARD</sub>
+      <p>Only receives. A big QR code waits on screen; anyone scans it with F3Nyx and sends. Files arrive in a <b>Received today</b> list.</p>
+    </td>
+  </tr>
+</table>
 
-**To change layout:** tap the other icon on the switch. A short switch screen confirms it.
 **Back-to-back sending:** the panel keeps the same code for 10 minutes and is ready again within seconds after each file. Your phone remembers the panel, so you can send file after file without scanning again.
 **To send to a smart board:** on your phone, open Transmit, tap **Scan panel QR**, then choose the file.
 
@@ -92,20 +144,28 @@ The app has two layouts. A small switch in the centre of the top bar, with a pho
 
 ## What It Can Do
 
-| Feature | What it means |
-|:--|:--|
-| **Send** | Send files, whole folders, or a piece of text. Switch between them with three small icons. |
-| **Receive** | Scan a QR code or type a code; files are saved in your `Downloads/FeNyx` folder |
-| **Progress ring** | A ring fills up and changes from red to yellow to green as the file moves, with speed and time left |
-| **Big files** | Large files (10 GB and more) send without the app closing |
-| **Notifications** | See progress while a transfer runs, cancel it, and open or share files when they arrive |
-| **Share all** | Share every received file at once, or open the Downloads folder |
-| **Send now, collect later** | Upload a locked copy that the other person can download later from a link; delete it any time |
-| **History** | See what you sent and received, and mark favourites |
-| **Share button** | Send straight from your gallery or file manager using Android's Share button |
-| **Finish animation** | A short animation plays inside its own card when a transfer finishes. Tap to skip, or turn it off in Settings. |
-| **Themes** | System, Light, Dark and Monet, which takes accent colours from your wallpaper |
-| **Languages** | English, Español, हिन्दी, 简体中文 and 繁體中文 |
+<table width="100%">
+  <tr>
+    <td width="33%" valign="top"><b>Send anything</b><br><sub>Files, whole folders or a piece of text</sub></td>
+    <td width="33%" valign="top"><b>Receive by QR or code</b><br><sub>Saved in your <code>Downloads/F3Nyx</code> folder</sub></td>
+    <td width="33%" valign="top"><b>Progress ring</b><br><sub>Fills red → yellow → green, with speed and time left</sub></td>
+  </tr>
+  <tr>
+    <td valign="top"><b>Big files</b><br><sub>10 GB and more, without the app closing</sub></td>
+    <td valign="top"><b>Notifications</b><br><sub>Progress, Cancel, then Open or Share when files arrive</sub></td>
+    <td valign="top"><b>Share all</b><br><sub>Share every received file at once</sub></td>
+  </tr>
+  <tr>
+    <td valign="top"><b>Send now, collect later</b><br><sub>A locked copy the other person downloads later from a link</sub></td>
+    <td valign="top"><b>History</b><br><sub>Everything sent and received, with favourites</sub></td>
+    <td valign="top"><b>Share button</b><br><sub>Send straight from your gallery or file manager</sub></td>
+  </tr>
+  <tr>
+    <td valign="top"><b>Finish animation</b><br><sub>A short lift-off or landing in its own card; tap to skip</sub></td>
+    <td valign="top"><b>Themes</b><br><sub>System, Light, Dark and Monet (wallpaper colours)</sub></td>
+    <td valign="top"><b>Languages</b><br><sub>English, Español, हिन्दी, 简体中文, 繁體中文</sub></td>
+  </tr>
+</table>
 
 ---
 
@@ -122,7 +182,7 @@ Both look and work the same. You can install one over the other.
 
 ## Install
 
-1. Download the app file (APK) from [Releases](https://github.com/Dray-Ashcroft/F3Nyx/releases).
+1. Download the app file (APK) from [Releases](https://github.com/Dray-Ashcroft/F3Nyx/releases/latest).
 2. Open it on your phone and tap **Install**. If asked, allow installing apps from this source.
 3. On Android 13 and newer, allow notifications when asked, to see transfer progress.
 
@@ -139,6 +199,17 @@ Both look and work the same. You can install one over the other.
 | Notifications | To show progress and finished transfers |
 | Network | To send and receive files |
 | Files and photos | To pick files to send and save files you receive |
+
+</details>
+
+<details>
+<summary><b>Check your download</b></summary>
+
+Each release has a `SHA256SUMS.txt`. On a computer, compare it with:
+
+```bash
+sha256sum F3Nyx-standard-release.apk
+```
 
 </details>
 
