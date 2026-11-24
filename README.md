@@ -1,4 +1,4 @@
-<p align="center">
+it<p align="center">
   <img src="assets/banner/banner.png" alt="F3Nyx — Simple, private file sharing" width="100%">
 </p>
 
@@ -234,7 +234,8 @@ The models were posed and turned into images for the app. See [ASSET_CREDITS.md]
 
 | Release | Title | Date |
 |:--|:--|:--|
-| Mrk V | Ember | 23 Nov 2026 |
+| Mrk IX | Fulgor | 24 Nov 2026 |
+| Mrk VI | Ember | 22 Nov 2026 |
 | Mrk IV | Delta | 27 Oct 2026 |
 | Mrk III | Triton | 10 Oct 2026 |
 | Mrk II | Requiem | 1 Oct 2026 |
