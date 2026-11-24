@@ -613,4 +613,9 @@
     <string name="receive_qr_steps">在发送的手机上：发送 → 选择文件 → 扫描二维码。传输开始后会自动关闭。</string>
     <string name="receive_qr_title">接收</string>
     <string name="receive_code_copied">已复制代码</string>
+    <string name="send_qr_title">发送</string>
+    <string name="send_qr_waiting">正在等待接收方…</string>
+    <string name="send_qr_steps">在接收的手机上：接收 → 扫描二维码。扫描后立即开始发送，此页面会自动关闭。</string>
+    <string name="send_hint_show">本机显示二维码并开始发送，接收方在“接收”中扫描。</string>
+    <string name="send_hint_scan">接收方或面板显示二维码，用本机扫描后点“发送”。</string>
 </resources>

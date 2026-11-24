@@ -108,7 +108,7 @@ A small switch in the centre of the top bar, with a phone icon and a panel icon,
     <td width="50%" valign="top">
       <b>Phone</b><br>
       <sub>FOR YOUR PHONE</sub><br>
-      Send (<b>Transmit</b>) and receive (<b>Retrieve</b>). Tap the round buttons at the bottom or swipe to switch. To receive, tap <b>Show QR</b> and let the sender scan it, or <b>Scan QR</b> on theirs.
+      Send (<b>Transmit</b>) and receive (<b>Retrieve</b>). Tap the round buttons at the bottom or swipe to switch. Both screens have round <b>Show QR</b> and <b>Scan QR</b> buttons: one phone shows the QR, the other scans it.
     </td>
     <td width="50%" valign="top">
       <b>Panel</b><br>

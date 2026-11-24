@@ -613,4 +613,9 @@
     <string name="receive_qr_steps">在傳送的手機上：傳送 → 選擇檔案 → 掃描 QR。傳輸開始後會自動關閉。</string>
     <string name="receive_qr_title">接收</string>
     <string name="receive_code_copied">已複製代碼</string>
+    <string name="send_qr_title">傳送</string>
+    <string name="send_qr_waiting">正在等待接收方…</string>
+    <string name="send_qr_steps">在接收的手機上：接收 → 掃描 QR。掃描後立即開始傳送，此頁面會自動關閉。</string>
+    <string name="send_hint_show">本機顯示 QR 並開始傳送，接收方在「接收」中掃描。</string>
+    <string name="send_hint_scan">接收方或面板顯示 QR，用本機掃描後點「傳送」。</string>
 </resources>

@@ -617,4 +617,9 @@
     <string name="receive_qr_steps">भेजने वाले फ़ोन पर: Transmit → फ़ाइलें चुनें → QR स्कैन करें। ट्रांसफ़र शुरू होते ही यह अपने-आप बंद हो जाएगा।</string>
     <string name="receive_qr_title">प्राप्त करें</string>
     <string name="receive_code_copied">कोड कॉपी हुआ</string>
+    <string name="send_qr_title">Transmit</string>
+    <string name="send_qr_waiting">प्राप्त करने वाले का इंतज़ार…</string>
+    <string name="send_qr_steps">प्राप्त करने वाले फ़ोन पर: Retrieve → QR स्कैन करें। स्कैन होते ही भेजना शुरू होगा; यह अपने-आप बंद हो जाएगा।</string>
+    <string name="send_hint_show">यह फ़ोन QR दिखाता है और भेजना शुरू करता है। प्राप्त करने वाला इसे Retrieve से स्कैन करता है।</string>
+    <string name="send_hint_scan">प्राप्त करने वाला या पैनल QR दिखाता है; इसे इस फ़ोन से स्कैन करें, फिर भेजें दबाएँ।</string>
 </resources>

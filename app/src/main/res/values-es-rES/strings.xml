@@ -616,4 +616,9 @@
     <string name="receive_qr_steps">En el teléfono que envía: Transmitir → elegir archivos → Escanear QR. Esto se cierra solo cuando empieza la transferencia.</string>
     <string name="receive_qr_title">Recibir</string>
     <string name="receive_code_copied">Código copiado</string>
+    <string name="send_qr_title">Transmitir</string>
+    <string name="send_qr_waiting">Esperando a quien recibe…</string>
+    <string name="send_qr_steps">En el teléfono que recibe: Recibir → Escanear QR. El envío empieza en cuanto lo escanea; esto se cierra solo.</string>
+    <string name="send_hint_show">este teléfono muestra un QR y empieza a enviar. Quien recibe lo escanea desde Recibir.</string>
+    <string name="send_hint_scan">quien recibe o un panel muestra un QR; escanéalo con este teléfono y pulsa Enviar.</string>
 </resources>

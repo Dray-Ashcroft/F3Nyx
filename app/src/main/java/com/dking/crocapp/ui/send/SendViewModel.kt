@@ -470,6 +470,25 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
         startSend(engine = CrocEngine.LEGACY)
     }
 
+    /** Closing Show QR before the receiver connected: stop waiting, keep files and code. */
+    fun stopWaitingForQr() {
+        when (crocProcess.state.value) {
+            is CrocTransferState.Preparing, is CrocTransferState.WaitingForPeer -> {
+                crocProcess.cancel()
+                crocProcess.reset()
+                StorageCleaner.cleanSendStaging(getApplication<CrocApp>())
+            }
+            else -> Unit
+        }
+    }
+
+    /** "New code" on the Show QR screen: restart the send with a fresh code. */
+    fun newCodeWhileShowingQr() {
+        stopWaitingForQr()
+        regenerateCode()
+        startSend()
+    }
+
     fun cancelTransfer() {
         crocProcess.cancel()
         StorageCleaner.cleanSendStaging(getApplication<CrocApp>())

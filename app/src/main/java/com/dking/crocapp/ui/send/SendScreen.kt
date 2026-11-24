@@ -1,5 +1,7 @@
 package com.dking.crocapp.ui.send
 
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.material.icons.rounded.QrCode
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -170,7 +172,8 @@ fun SendScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
     val clipboardManager = LocalClipboardManager.current
-    var showQrCode by remember { mutableStateOf(false) }
+    var showQr by remember { mutableStateOf(false) }
+    var showQrHelp by remember { mutableStateOf(false) }
     var hideCodePhrase by remember { mutableStateOf(false) }
     var showCodeMenu by remember { mutableStateOf(false) }
     var showAllFiles by remember { mutableStateOf(false) }
@@ -195,6 +198,24 @@ fun SendScreen(
             uiState.transferState is CrocTransferState.WaitingForPeer ||
             uiState.transferState is CrocTransferState.Transferring
     val isStoreCompleted = uiState.isStoreMode && uiState.transferState is CrocTransferState.StoreCompleted
+    val isWaitingForQr = !uiState.isStoreMode && (uiState.transferState is CrocTransferState.Preparing ||
+            uiState.transferState is CrocTransferState.WaitingForPeer)
+    // The QR closes by itself once the receiver connects (or the send ends).
+    LaunchedEffect(uiState.transferState) {
+        if (showQr && !isWaitingForQr && uiState.transferState !is CrocTransferState.Idle) showQr = false
+    }
+    if (showQr && uiState.codePhrase.isNotBlank()) {
+        com.dking.crocapp.ui.components.ShowQrDialog(
+            title = stringResource(R.string.send_qr_title),
+            code = uiState.codePhrase,
+            qrData = QrCodeParser.receiveDeepLink(uiState.codePhrase),
+            waiting = stringResource(R.string.send_qr_waiting),
+            steps = stringResource(R.string.send_qr_steps),
+            onNewCode = { viewModel.newCodeWhileShowingQr() },
+            onCopy = { clipboardManager.setText(AnnotatedString(uiState.codePhrase)) },
+            onClose = { showQr = false; viewModel.stopWaitingForQr() }
+        )
+    }
     val isDirectCompleted = !uiState.isStoreMode && uiState.transferState is CrocTransferState.Completed
     val isTransferFinished = isDirectCompleted ||
             isStoreCompleted ||
@@ -619,6 +640,51 @@ fun SendScreen(
                                 engine = uiState.activeEngine,
                                 onClick = if (!isTransferActive && uiState.activeEngine == com.dking.crocapp.croc.CrocEngine.LEGACY) { { viewModel.toggleEngine() } } else null
                             )
+                            com.dking.crocapp.ui.components.HelpDot(open = showQrHelp, onToggle = { showQrHelp = !showQrHelp })
+                            Box {
+                                IconButton(onClick = { showCodeMenu = true }) {
+                                    Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.action_more_options))
+                                }
+                                androidx.compose.material3.DropdownMenu(
+                                    expanded = showCodeMenu,
+                                    onDismissRequest = { showCodeMenu = false }
+                                ) {
+                                    androidx.compose.material3.DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.action_save)) },
+                                        enabled = !isTransferActive && uiState.codePhrase.isNotBlank(),
+                                        onClick = { showCodeMenu = false; viewModel.saveCurrentCode() },
+                                        leadingIcon = { Icon(Icons.Rounded.Save, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                    )
+                                    if (uiState.defaultCodePhrase.isNotBlank() && uiState.defaultCodePhrase != uiState.codePhrase) {
+                                        androidx.compose.material3.DropdownMenuItem(
+                                            text = { Text(stringResource(R.string.send_use_default_code)) },
+                                            enabled = !isTransferActive,
+                                            onClick = { showCodeMenu = false; viewModel.useCodePhrase(uiState.defaultCodePhrase) },
+                                            leadingIcon = { Icon(Icons.Rounded.Home, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                        )
+                                    }
+                                    androidx.compose.material3.DropdownMenuItem(
+                                        text = { Text(stringResource(R.string.send_share_qr)) },
+                                        enabled = uiState.codePhrase.isNotBlank(),
+                                        onClick = {
+                                            showCodeMenu = false
+                                            shareQrCode(context = context, codePhrase = uiState.codePhrase)
+                                        },
+                                        leadingIcon = { Icon(Icons.Rounded.Share, contentDescription = null, modifier = Modifier.size(18.dp)) }
+                                    )
+                                    androidx.compose.material3.DropdownMenuItem(
+                                        text = { Text(if (hideCodePhrase) stringResource(R.string.send_show_code) else stringResource(R.string.send_hide_code)) },
+                                        onClick = { showCodeMenu = false; hideCodePhrase = !hideCodePhrase },
+                                        leadingIcon = {
+                                            Icon(
+                                                if (hideCodePhrase) Icons.Rounded.Visibility else Icons.Rounded.VisibilityOff,
+                                                contentDescription = null,
+                                                modifier = Modifier.size(18.dp)
+                                            )
+                                        }
+                                    )
+                                }
+                            }
                         }
                     OutlinedTextField(
                         value = uiState.codePhrase,
@@ -654,72 +720,34 @@ fun SendScreen(
                         }
                     )
 
-                    // Main extra action + everything else tucked into ⋮
+                    // Same QR pair as Retrieve: show ours (the receiver scans) or scan theirs.
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+                        horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally)
                     ) {
-                        // Scan a smart panel's QR to send straight to it.
-                        FilledTonalButton(
-                            onClick = onOpenScanner,
-                            enabled = !isTransferActive,
-                            modifier = Modifier.weight(1f),
-                            shape = MaterialTheme.shapes.large
-                        ) {
-                            Icon(Icons.Rounded.QrCodeScanner, contentDescription = null, modifier = Modifier.size(18.dp))
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text(stringResource(R.string.send_scan_panel_qr))
-                        }
-                        Box {
-                            IconButton(onClick = { showCodeMenu = true }) {
-                                Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.action_more_options))
-                            }
-                            androidx.compose.material3.DropdownMenu(
-                                expanded = showCodeMenu,
-                                onDismissRequest = { showCodeMenu = false }
-                            ) {
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.action_save)) },
-                                    enabled = !isTransferActive && uiState.codePhrase.isNotBlank(),
-                                    onClick = { showCodeMenu = false; viewModel.saveCurrentCode() },
-                                    leadingIcon = { Icon(Icons.Rounded.Save, contentDescription = null, modifier = Modifier.size(18.dp)) }
-                                )
-                                if (uiState.defaultCodePhrase.isNotBlank() && uiState.defaultCodePhrase != uiState.codePhrase) {
-                                    androidx.compose.material3.DropdownMenuItem(
-                                        text = { Text(stringResource(R.string.send_use_default_code)) },
-                                        enabled = !isTransferActive,
-                                        onClick = { showCodeMenu = false; viewModel.useCodePhrase(uiState.defaultCodePhrase) },
-                                        leadingIcon = { Icon(Icons.Rounded.Home, contentDescription = null, modifier = Modifier.size(18.dp)) }
-                                    )
+                        com.dking.crocapp.ui.components.QrRoundButton(
+                            icon = Icons.Rounded.QrCode,
+                            label = stringResource(R.string.receive_show_qr),
+                            enabled = (canSend && !uiState.isStoreMode && !isTransferActive) || isWaitingForQr,
+                            onClick = {
+                                if (!isWaitingForQr) {
+                                    if (isTransferFinished) viewModel.dismissTransferResult()
+                                    viewModel.startSend()
                                 }
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(if (showQrCode) stringResource(R.string.send_hide_qr) else stringResource(R.string.send_qr_code)) },
-                                    enabled = uiState.codePhrase.isNotBlank(),
-                                    onClick = { showCodeMenu = false; showQrCode = !showQrCode },
-                                    leadingIcon = { Icon(Icons.Rounded.QrCode2, contentDescription = null, modifier = Modifier.size(18.dp)) }
-                                )
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(stringResource(R.string.send_share_qr)) },
-                                    enabled = uiState.codePhrase.isNotBlank(),
-                                    onClick = {
-                                        showCodeMenu = false
-                                        shareQrCode(context = context, codePhrase = uiState.codePhrase)
-                                    },
-                                    leadingIcon = { Icon(Icons.Rounded.Share, contentDescription = null, modifier = Modifier.size(18.dp)) }
-                                )
-                                androidx.compose.material3.DropdownMenuItem(
-                                    text = { Text(if (hideCodePhrase) stringResource(R.string.send_show_code) else stringResource(R.string.send_hide_code)) },
-                                    onClick = { showCodeMenu = false; hideCodePhrase = !hideCodePhrase },
-                                    leadingIcon = {
-                                        Icon(
-                                            if (hideCodePhrase) Icons.Rounded.Visibility else Icons.Rounded.VisibilityOff,
-                                            contentDescription = null,
-                                            modifier = Modifier.size(18.dp)
-                                        )
-                                    }
-                                )
+                                showQr = true
                             }
+                        )
+                        com.dking.crocapp.ui.components.QrRoundButton(
+                            icon = Icons.Rounded.QrCodeScanner,
+                            label = stringResource(R.string.send_scan_panel_qr),
+                            enabled = !isTransferActive,
+                            onClick = onOpenScanner
+                        )
+                    }
+                    AnimatedVisibility(visible = showQrHelp) {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            com.dking.crocapp.ui.components.QrHint(Icons.Rounded.QrCode, stringResource(R.string.receive_show_qr), stringResource(R.string.send_hint_show))
+                            com.dking.crocapp.ui.components.QrHint(Icons.Rounded.QrCodeScanner, stringResource(R.string.send_scan_panel_qr), stringResource(R.string.send_hint_scan))
                         }
                     }
 
@@ -760,21 +788,6 @@ fun SendScreen(
                         }
                     }
 
-                    // QR Code display
-                    AnimatedVisibility(visible = showQrCode && uiState.codePhrase.isNotBlank()) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            QrCodeImage(
-                                // Deep link, so a phone camera opens the app directly.
-                                data = QrCodeParser.receiveDeepLink(uiState.codePhrase),
-                                size = 180.dp
-                            )
-                        }
-                    }
                 }
             }
         }

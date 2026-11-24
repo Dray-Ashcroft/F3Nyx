@@ -140,8 +140,8 @@ android {
         applicationId = "com.drayashcroft.fenyx"
         minSdk = 26
         targetSdk = 35
-        versionCode = 32
-        versionName = "7.6.8"
+        versionCode = 33
+        versionName = "8.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 

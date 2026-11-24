@@ -22,7 +22,13 @@ class ReadmeShotsQr {
     fun showQr() {
         rule.setContent {
             CrocTheme(darkTheme = true) {
-                ShowQrContent(code = "4821-amber-falcon-river", onNewCode = {}, onCopy = {}, onClose = {})
+                com.dking.crocapp.ui.components.ShowQrContent(
+                    title = "Retrieve", code = "4821-amber-falcon-river",
+                    qrData = com.dking.crocapp.util.QrCodeParser.sendDeepLink("4821-amber-falcon-river", once = true),
+                    waiting = "Waiting for the sender…",
+                    steps = "On the sending phone: Transmit → pick files → Scan QR. This closes by itself when the transfer starts.",
+                    onNewCode = {}, onCopy = {}, onClose = {}
+                )
             }
         }
         rule.mainClock.advanceTimeBy(600)

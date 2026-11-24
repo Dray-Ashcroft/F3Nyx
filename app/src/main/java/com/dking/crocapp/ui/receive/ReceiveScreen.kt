@@ -174,8 +174,12 @@ fun ReceiveScreen(
         if (showQr && !isWaitingForQr && uiState.transferState !is CrocTransferState.Idle) showQr = false
     }
     if (showQr && uiState.codePhrase.isNotBlank()) {
-        ShowQrDialog(
+        com.dking.crocapp.ui.components.ShowQrDialog(
+            title = stringResource(R.string.receive_qr_title),
             code = uiState.codePhrase,
+            qrData = com.dking.crocapp.util.QrCodeParser.sendDeepLink(uiState.codePhrase, once = true),
+            waiting = stringResource(R.string.receive_qr_waiting),
+            steps = stringResource(R.string.receive_qr_steps),
             onNewCode = { viewModel.showQrAndWait() },
             onCopy = {
                 clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(uiState.codePhrase))
@@ -298,7 +302,7 @@ fun ReceiveScreen(
                             )
                         }
                         EngineBadge(engine = uiState.activeEngine)
-                        HelpDot(open = showQrHelp, onToggle = { showQrHelp = !showQrHelp })
+                        com.dking.crocapp.ui.components.HelpDot(open = showQrHelp, onToggle = { showQrHelp = !showQrHelp })
                         Box {
                             IconButton(onClick = { showCodeMenu = true }, modifier = Modifier.size(32.dp)) {
                                 Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.action_more_options))
@@ -350,7 +354,7 @@ fun ReceiveScreen(
                         modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
                         horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally)
                     ) {
-                        QrRoundButton(
+                        com.dking.crocapp.ui.components.QrRoundButton(
                             icon = Icons.Rounded.QrCode,
                             label = stringResource(R.string.receive_show_qr),
                             enabled = !isTransferActive || isWaitingForQr,
@@ -359,7 +363,7 @@ fun ReceiveScreen(
                                 showQr = true
                             }
                         )
-                        QrRoundButton(
+                        com.dking.crocapp.ui.components.QrRoundButton(
                             icon = Icons.Rounded.QrCodeScanner,
                             label = stringResource(R.string.receive_scan_sender_qr),
                             enabled = !isTransferActive,
@@ -372,8 +376,8 @@ fun ReceiveScreen(
                         exit = androidx.compose.animation.shrinkVertically() + fadeOut()
                     ) {
                         Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                            QrHint(Icons.Rounded.QrCode, stringResource(R.string.receive_show_qr), stringResource(R.string.receive_hint_show))
-                            QrHint(Icons.Rounded.QrCodeScanner, stringResource(R.string.receive_scan_sender_qr), stringResource(R.string.receive_hint_scan))
+                            com.dking.crocapp.ui.components.QrHint(Icons.Rounded.QrCode, stringResource(R.string.receive_show_qr), stringResource(R.string.receive_hint_show))
+                            com.dking.crocapp.ui.components.QrHint(Icons.Rounded.QrCodeScanner, stringResource(R.string.receive_scan_sender_qr), stringResource(R.string.receive_hint_scan))
                         }
                     }
                     Text(
@@ -887,188 +891,5 @@ private fun RoundAction(
     Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
         com.dking.crocapp.ui.components.GlassRoundButton(icon = icon, label = label, onClick = onClick, size = 52.dp)
         Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-
-@Composable
-private fun QrRoundButton(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    enabled: Boolean,
-    onClick: () -> Unit
-) {
-    val gold = MaterialTheme.colorScheme.secondary
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        androidx.compose.material3.Surface(
-            onClick = onClick,
-            enabled = enabled,
-            shape = androidx.compose.foundation.shape.CircleShape,
-            color = gold.copy(alpha = if (enabled) 0.14f else 0.06f),
-            contentColor = if (enabled) gold else gold.copy(alpha = 0.4f),
-            border = androidx.compose.foundation.BorderStroke(1.dp, gold.copy(alpha = if (enabled) 0.32f else 0.12f)),
-            // The label sits below; screen readers still hear the button's name.
-            modifier = Modifier.size(58.dp).semantics { contentDescription = label }
-        ) {
-            Box(contentAlignment = Alignment.Center) {
-                Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
-            }
-        }
-        Text(
-            label,
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.5f)
-        )
-    }
-}
-
-@Composable
-private fun HelpDot(open: Boolean, onToggle: () -> Unit) {
-    val turn by androidx.compose.animation.core.animateFloatAsState(if (open) 360f else 0f, label = "helpTurn")
-    val cs = MaterialTheme.colorScheme
-    val desc = stringResource(if (open) R.string.receive_qr_help_hide else R.string.receive_qr_help_show)
-    androidx.compose.material3.Surface(
-        onClick = onToggle,
-        shape = androidx.compose.foundation.shape.CircleShape,
-        color = if (open) cs.inverseSurface else androidx.compose.ui.graphics.Color.Transparent,
-        contentColor = if (open) cs.inverseOnSurface else cs.onSurfaceVariant,
-        border = androidx.compose.foundation.BorderStroke(1.dp, cs.outlineVariant),
-        modifier = Modifier.size(30.dp).semantics { contentDescription = desc }
-    ) {
-        Box(contentAlignment = Alignment.Center) {
-            Icon(
-                Icons.Outlined.Info, contentDescription = null,
-                modifier = Modifier.size(17.dp).graphicsLayer { rotationZ = turn }
-            )
-        }
-    }
-}
-
-@Composable
-private fun QrHint(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, body: String) {
-    val cs = MaterialTheme.colorScheme
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(14.dp))
-            .background(cs.surfaceContainerHighest.copy(alpha = 0.6f))
-            .padding(horizontal = 12.dp, vertical = 9.dp),
-        horizontalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Icon(icon, contentDescription = null, tint = cs.secondary, modifier = Modifier.size(16.dp).padding(top = 1.dp))
-        Text(
-            androidx.compose.ui.text.buildAnnotatedString {
-                pushStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.SemiBold, color = cs.onSurface))
-                append(title)
-                pop()
-                append(" — ")
-                append(body)
-            },
-            style = MaterialTheme.typography.bodySmall,
-            color = cs.onSurfaceVariant
-        )
-    }
-}
-
-/** Phone "Show QR": the code as a big QR; closes itself when the sender connects. */
-@Composable
-private fun ShowQrDialog(code: String, onNewCode: () -> Unit, onCopy: () -> Unit, onClose: () -> Unit) {
-    androidx.compose.ui.window.Dialog(
-        onDismissRequest = onClose,
-        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
-    ) {
-        ShowQrContent(code, onNewCode, onCopy, onClose)
-    }
-}
-
-@Composable
-internal fun ShowQrContent(code: String, onNewCode: () -> Unit, onCopy: () -> Unit, onClose: () -> Unit) {
-    run {
-        androidx.compose.material3.Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
-            androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
-                val qr = minOf(maxWidth - 96.dp, maxHeight * 0.42f, 320.dp)
-                Column(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 20.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            stringResource(R.string.receive_qr_title),
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.weight(1f)
-                        )
-                        com.dking.crocapp.ui.components.GlassRoundButton(
-                            icon = Icons.Rounded.Close,
-                            label = stringResource(R.string.action_close),
-                            onClick = onClose
-                        )
-                    }
-                    Spacer(Modifier.weight(1f))
-                    com.dking.crocapp.ui.components.QrCodeImage(
-                        data = com.dking.crocapp.util.QrCodeParser.sendDeepLink(code, once = true),
-                        size = qr, padding = 16.dp, expandable = false, showExpandHint = false
-                    )
-                    Spacer(Modifier.height(20.dp))
-                    Text(
-                        code,
-                        fontFamily = com.dking.crocapp.ui.theme.MonoFamily,
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.secondary,
-                        maxLines = 1,
-                        softWrap = false
-                    )
-                    Spacer(Modifier.height(12.dp))
-                    WaitingDot()
-                    Spacer(Modifier.height(20.dp))
-                    Row(horizontalArrangement = Arrangement.spacedBy(28.dp)) {
-                        LabeledRound(Icons.Rounded.Refresh, stringResource(R.string.panel_new_code_now), onNewCode)
-                        LabeledRound(Icons.Rounded.ContentCopy, stringResource(R.string.action_copy), onCopy)
-                    }
-                    Spacer(Modifier.weight(1f))
-                    Text(
-                        stringResource(R.string.receive_qr_steps),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
-                            .padding(12.dp)
-                    )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun WaitingDot() {
-    val t = androidx.compose.animation.core.rememberInfiniteTransition(label = "wait")
-    val a by t.animateFloat(
-        1f, 0.3f,
-        androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(700), androidx.compose.animation.core.RepeatMode.Reverse),
-        label = "waitDot"
-    )
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        Box(
-            Modifier.size(9.dp).graphicsLayer { alpha = a }
-                .clip(androidx.compose.foundation.shape.CircleShape)
-                .background(androidx.compose.ui.graphics.Color(0xFF30C26B))
-        )
-        Text(stringResource(R.string.receive_qr_waiting), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-@Composable
-private fun LabeledRound(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
-    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
-        com.dking.crocapp.ui.components.GlassRoundButton(icon = icon, label = label, onClick = onClick, size = 48.dp)
-        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

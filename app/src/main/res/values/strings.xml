@@ -639,4 +639,9 @@
     <string name="receive_qr_steps">On the sending phone: Transmit → pick files → Scan QR. This closes by itself when the transfer starts.</string>
     <string name="receive_qr_title">Retrieve</string>
     <string name="receive_code_copied">Code copied</string>
+    <string name="send_qr_title">Transmit</string>
+    <string name="send_qr_waiting">Waiting for the receiver…</string>
+    <string name="send_qr_steps">On the receiving phone: Retrieve → Scan QR. Sending starts as soon as it scans; this closes by itself.</string>
+    <string name="send_hint_show">this phone shows a QR and starts sending. The receiver scans it from Retrieve.</string>
+    <string name="send_hint_scan">the receiver or a panel shows a QR; scan it with this phone, then tap Send.</string>
 </resources>

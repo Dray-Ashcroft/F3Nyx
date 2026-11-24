@@ -8,7 +8,7 @@ Adios **Crovan**, bonjour **F3Nyx** (Phoenix): Release V rises with a calmer dar
 - 🏫 **New panel layout** — QR and code on the left with round **Big QR**, **New code** and **Animation** buttons; progress and a **Received today** list (Files / Text) on the right.
 - ⚡ **Back-to-back sending** — The panel keeps its code for 10 minutes and is ready again within seconds, and your phone remembers the panel, so you can send file after file without rescanning.
 - 🔍 **Big QR** — One tap shows a full-screen QR with the code in large letters, readable from the back of a classroom.
-- 📲 **Show QR on phones** — Retrieve now has round **Show QR** and **Scan QR** buttons. Show QR puts this phone's code on screen and waits; the sender scans it with **Scan QR** on Transmit. A small **i** explains both.
+- 📲 **Show QR / Scan QR** — Transmit and Retrieve both have round **Show QR** and **Scan QR** buttons. One phone shows the QR, the other scans it, and the transfer starts by itself. A small **i** explains both.
 - ℹ️ **Quiet help** — On the panel, the how-to steps hide behind a round **i** button and open only when you tap it.
 - 🗂️ **Two-card layout** — Everything you set up sits in one card; progress and the finish animation get their own card below, so nothing overlaps.
 - 🫧 **Water-drop taps** — Files, Folder and Text are three small icons with a sliding bubble. Tapping them, the phone / panel switch or Transmit / Retrieve sends out a soft ripple.
