@@ -1,40 +1,23 @@
-it<p align="center">
+<p align="center">
   <img src="assets/banner/banner.png" alt="F3Nyx — Simple, private file sharing" width="100%">
 </p>
 
-<h1 align="center">F3Nyx (Phoenix)</h1>
-
 <p align="center">
-  <em>Send files from one device to another. Simple and private.</em>
+  <a href="https://github.com/Dray-Ashcroft/F3Nyx/releases/latest"><img src="https://img.shields.io/github/v/release/Dray-Ashcroft/F3Nyx?style=flat-square&label=release&color=E5484D&labelColor=1B1B1F" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/Android-8.0%2B-E2B33C?style=flat-square&labelColor=1B1B1F&logo=android&logoColor=white" alt="Android 8.0 or newer">
+  <img src="https://img.shields.io/badge/encryption-end--to--end-38BDF8?style=flat-square&labelColor=1B1B1F" alt="End-to-end encrypted">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-GPL--3.0-A0A0A8?style=flat-square&labelColor=1B1B1F" alt="GPL-3.0 licence"></a>
 </p>
 
 <p align="center">
-  <a href="https://github.com/Dray-Ashcroft/F3Nyx/releases/latest"><img src="https://img.shields.io/github/v/release/Dray-Ashcroft/F3Nyx?style=for-the-badge&label=Release&color=E5484D&labelColor=0E0E10" alt="Latest release"></a>
-  <img src="https://img.shields.io/badge/Android-8.0%2B-E2B33C?style=for-the-badge&labelColor=0E0E10&logo=android&logoColor=white" alt="Android 8.0 or newer">
-  <img src="https://img.shields.io/badge/Encryption-End--to--end-38BDF8?style=for-the-badge&labelColor=0E0E10" alt="End-to-end encrypted">
-  <a href="LICENSE"><img src="https://img.shields.io/badge/License-GPL--3.0-A0A0A8?style=for-the-badge&labelColor=0E0E10" alt="GPL-3.0 licence"></a>
-</p>
-
-<p align="center">
-  <a href="https://github.com/Dray-Ashcroft/F3Nyx/releases/latest"><strong>Download the app</strong></a>
-</p>
-
-<p align="center">
-  <a href="#about">About</a> ·
+  <a href="https://github.com/Dray-Ashcroft/F3Nyx/releases/latest"><b>Download</b></a> ·
   <a href="#how-it-works">How it works</a> ·
-  <a href="#screenshots">Screenshots</a> ·
-  <a href="#two-layouts">Layouts</a> ·
   <a href="#what-it-can-do">Features</a> ·
-  <a href="#which-version-to-download">Versions</a> ·
   <a href="#install">Install</a> ·
-  <a href="#credits">Credits</a> ·
-  <a href="#releases">Releases</a> ·
-  <a href="#license">License</a>
+  <a href="#credits">Credits</a>
 </p>
 
----
-
-<p align="center"><em>Project dedicated to Lord Vishnu</em></p>
+<p align="center"><sub><em>Project dedicated to Lord Vishnu</em></sub></p>
 
 ---
 
@@ -44,20 +27,6 @@ F3Nyx lets you send files, folders or text from one phone, tablet or computer to
 
 F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and on the Android app made by [Dking08](https://github.com/Dking08). It rose from Kroc-Sauria and Crovan, hence the name: a phoenix.
 
-<p align="center">
-  <img src="assets/about.png" alt="F3Nyx on a smart panel and a phone" width="100%">
-</p>
-
-<table width="100%">
-  <tr>
-    <td width="50%" align="center"><b>0</b><br><sub>accounts needed</sub></td>
-    <td width="50%" align="center"><b>10 GB+</b><br><sub>files, without crashing</sub></td>
-  </tr>
-  <tr>
-    <td width="50%" align="center"><b>2</b><br><sub>layouts: phone and smart board</sub></td>
-    <td width="50%" align="center"><b>5</b><br><sub>languages</sub></td>
-  </tr>
-</table>
 
 ---
 
@@ -67,35 +36,7 @@ F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and
   <img src="assets/how-it-works.png" alt="01 Pick files, 02 share the code with Show QR, 03 receive" width="100%">
 </p>
 
-1. **Pick** — choose files, a folder or text on the sending device.
-2. **Share the code** — show the QR on either phone, or read out the short code.
-3. **Receive** — scan with **Scan QR** or type the code. Done.
-
----
-
-## Screenshots
-
-<p align="center">
-  <img src="assets/screenshots/Panel.png" alt="Panel layout with a large QR code and the Received today list" width="100%">
-  <br><sub><b>Panel layout</b> · smart board, landscape</sub>
-</p>
-
-<table width="100%">
-  <tr>
-    <td width="33%" align="center">
-      <img src="assets/screenshots/Phone.png" alt="Phone layout: Transmit with three files picked" width="100%">
-      <br><sub><b>Phone layout</b></sub>
-    </td>
-    <td width="33%" align="center">
-      <img src="assets/screenshots/Transmit.png" alt="Transmit while sending, with the progress ring" width="100%">
-      <br><sub><b>Transmit</b></sub>
-    </td>
-    <td width="33%" align="center">
-      <img src="assets/screenshots/Retrieve.png" alt="Retrieve after receiving, with the landing animation" width="100%">
-      <br><sub><b>Retrieve</b></sub>
-    </td>
-  </tr>
-</table>
+<sub>Pick files · show or scan the QR · done. No account, no cable, no shared Wi-Fi.</sub>
 
 ---
 
