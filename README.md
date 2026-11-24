@@ -50,12 +50,12 @@ F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and
 
 <table width="100%">
   <tr>
-    <td width="50%" align="center"><h3>0</h3><sub>accounts needed</sub></td>
-    <td width="50%" align="center"><h3>10 GB+</h3><sub>files, without crashing</sub></td>
+    <td width="50%" align="center"><b>0</b><br><sub>accounts needed</sub></td>
+    <td width="50%" align="center"><b>10 GB+</b><br><sub>files, without crashing</sub></td>
   </tr>
   <tr>
-    <td width="50%" align="center"><h3>2</h3><sub>layouts: phone and smart board</sub></td>
-    <td width="50%" align="center"><h3>5</h3><sub>languages</sub></td>
+    <td width="50%" align="center"><b>2</b><br><sub>layouts: phone and smart board</sub></td>
+    <td width="50%" align="center"><b>5</b><br><sub>languages</sub></td>
   </tr>
 </table>
 
@@ -75,25 +75,24 @@ F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and
 
 ## Screenshots
 
+<p align="center">
+  <img src="assets/screenshots/Panel.png" alt="Panel layout with a large QR code and the Received today list" width="100%">
+  <br><sub><b>Panel layout</b> · smart board, landscape</sub>
+</p>
+
 <table width="100%">
   <tr>
-    <td width="50%" align="center">
-      <img src="assets/screenshots/Phone.png" alt="Phone layout with the Transmit screen" width="85%">
-      <br><sub><b>1 · Phone layout</b></sub>
+    <td width="33%" align="center">
+      <img src="assets/screenshots/Phone.png" alt="Phone layout: Transmit with three files picked" width="100%">
+      <br><sub><b>Phone layout</b></sub>
     </td>
-    <td width="50%" align="center">
-      <img src="assets/screenshots/Panel.png" alt="Panel layout with a large QR code" width="85%">
-      <br><sub><b>2 · Panel layout</b></sub>
+    <td width="33%" align="center">
+      <img src="assets/screenshots/Transmit.png" alt="Transmit while sending, with the progress ring" width="100%">
+      <br><sub><b>Transmit</b></sub>
     </td>
-  </tr>
-  <tr>
-    <td width="50%" align="center">
-      <img src="assets/screenshots/Transmit.png" alt="Transmit screen while sending" width="85%">
-      <br><sub><b>3 · Transmit (Send)</b></sub>
-    </td>
-    <td width="50%" align="center">
-      <img src="assets/screenshots/Retrieve.png" alt="Retrieve screen for receiving" width="85%">
-      <br><sub><b>4 · Retrieve (Receive)</b></sub>
+    <td width="33%" align="center">
+      <img src="assets/screenshots/Retrieve.png" alt="Retrieve after receiving, with the landing animation" width="100%">
+      <br><sub><b>Retrieve</b></sub>
     </td>
   </tr>
 </table>
@@ -107,20 +106,20 @@ A small switch in the centre of the top bar, with a phone icon and a panel icon,
 <table width="100%">
   <tr>
     <td width="50%" valign="top">
-      <h3>Phone</h3>
-      <sub>FOR YOUR PHONE</sub>
-      <p>Send (<b>Transmit</b>) and receive (<b>Retrieve</b>). Tap the round buttons at the bottom or swipe to switch. Pick files, a folder or text with three small icons.</p>
+      <b>Phone</b><br>
+      <sub>FOR YOUR PHONE</sub><br>
+      Send (<b>Transmit</b>) and receive (<b>Retrieve</b>). Tap the round buttons at the bottom or swipe to switch. To receive, tap <b>Show QR</b> and let the sender scan it, or <b>Scan QR</b> on theirs.
     </td>
     <td width="50%" valign="top">
-      <h3>Panel</h3>
-      <sub>FOR A TABLET OR CLASSROOM SMART BOARD</sub>
-      <p>Only receives. A big QR code waits on screen; anyone scans it with F3Nyx and sends. Files arrive in a <b>Received today</b> list.</p>
+      <b>Panel</b><br>
+      <sub>FOR A TABLET OR CLASSROOM SMART BOARD</sub><br>
+      Only receives. A big QR code waits on screen; anyone scans it with F3Nyx and sends. Files arrive in a <b>Received today</b> list.
     </td>
   </tr>
 </table>
 
-**Back-to-back sending:** the panel keeps the same code for 10 minutes and is ready again within seconds after each file. Your phone remembers the panel, so you can send file after file without scanning again.
-**To send to a smart board:** on your phone, open Transmit, tap **Scan panel QR**, then choose the file.
+**Back-to-back sending:** the panel keeps the same code for 10 minutes and is ready again within seconds after each file. Your phone remembers the panel, so you can send file after file without scanning again.<br>
+**To send to a smart board:** on your phone, open Transmit, tap **Scan QR**, then choose the file.
 
 <details>
 <summary><b>Panel buttons</b></summary>
@@ -140,24 +139,28 @@ A small switch in the centre of the top bar, with a phone icon and a panel icon,
 
 <table width="100%">
   <tr>
-    <td width="33%" valign="top"><b>Send anything</b><br><sub>Files, whole folders or a piece of text</sub></td>
-    <td width="33%" valign="top"><b>Receive by QR or code</b><br><sub>Saved in your <code>Downloads/F3Nyx</code> folder</sub></td>
-    <td width="33%" valign="top"><b>Progress ring</b><br><sub>Fills red → yellow → green, with speed and time left</sub></td>
+    <td width="50%" valign="top"><b>Send anything</b><br><sub>Files, whole folders or a piece of text</sub></td>
+    <td width="50%" valign="top"><b>Show QR or Scan QR</b><br><sub>Either phone can show the QR; files land in <code>Downloads/F3Nyx</code></sub></td>
   </tr>
   <tr>
-    <td valign="top"><b>Big files</b><br><sub>10 GB and more, without the app closing</sub></td>
-    <td valign="top"><b>Notifications</b><br><sub>Progress, Cancel, then Open or Share when files arrive</sub></td>
-    <td valign="top"><b>Share all</b><br><sub>Share every received file at once</sub></td>
+    <td width="50%" valign="top"><b>Progress ring</b><br><sub>Fills red → yellow → green, with speed and time left</sub></td>
+    <td width="50%" valign="top"><b>Big files</b><br><sub>10 GB and more, without the app closing</sub></td>
   </tr>
   <tr>
-    <td valign="top"><b>Send now, collect later</b><br><sub>A locked copy the other person downloads later from a link</sub></td>
-    <td valign="top"><b>History</b><br><sub>Everything sent and received, with favourites</sub></td>
-    <td valign="top"><b>Share button</b><br><sub>Send straight from your gallery or file manager</sub></td>
+    <td width="50%" valign="top"><b>Notifications</b><br><sub>Progress and Cancel, then Open or Share when files arrive</sub></td>
+    <td width="50%" valign="top"><b>Share all</b><br><sub>Share every received file at once</sub></td>
   </tr>
   <tr>
-    <td valign="top"><b>Finish animation</b><br><sub>A short lift-off or landing in its own card; tap to skip</sub></td>
-    <td valign="top"><b>Themes</b><br><sub>System, Light, Dark and Monet (wallpaper colours)</sub></td>
-    <td valign="top"><b>Languages</b><br><sub>English, Español, हिन्दी, 简体中文, 繁體中文</sub></td>
+    <td width="50%" valign="top"><b>Send now, collect later</b><br><sub>A locked copy the other person downloads later from a link</sub></td>
+    <td width="50%" valign="top"><b>History</b><br><sub>Everything sent and received, with favourites</sub></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><b>Share button</b><br><sub>Send straight from your gallery or file manager</sub></td>
+    <td width="50%" valign="top"><b>Finish animation</b><br><sub>A short lift-off or landing in its own card; tap to skip</sub></td>
+  </tr>
+  <tr>
+    <td width="50%" valign="top"><b>Themes</b><br><sub>System, Light, Dark and Monet (wallpaper colours)</sub></td>
+    <td width="50%" valign="top"><b>Languages</b><br><sub>English, Español, हिन्दी, 简体中文, 繁體中文</sub></td>
   </tr>
 </table>
 
