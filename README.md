@@ -234,11 +234,11 @@ The models were posed and turned into images for the app. See [ASSET_CREDITS.md]
 
 | Release | Title | Date |
 |:--|:--|:--|
-| RC V | Ember | 23 Nov 2026 |
-| RC IV | Delta | 27 Oct 2026 |
-| RC III | Triton | 10 Oct 2026 |
-| RC II | Requiem | 1 Oct 2026 |
-| RC I | Dawn | 1 Oct 2026 |
+| Mrk V | Ember | 23 Nov 2026 |
+| Mrk IV | Delta | 27 Oct 2026 |
+| Mrk III | Triton | 10 Oct 2026 |
+| Mrk II | Requiem | 1 Oct 2026 |
+| Mrk I | Dawn | 1 Oct 2026 |
 
 ---
 
