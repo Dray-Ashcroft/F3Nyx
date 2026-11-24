@@ -101,25 +101,11 @@ F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and
 
 ## Two Layouts
 
-A small switch in the centre of the top bar, with a phone icon and a panel icon, shows which layout you are in. Tap the other icon to change it.
+<p align="center">
+  <img src="assets/layouts.png" alt="Phone layout: Transmit and Retrieve, Show QR and Scan QR on both screens. Panel layout: only receives, a big QR waits on screen, files land in Received today. Back-to-back: the panel keeps its code for 10 minutes. Send to a board: Transmit, pick files, Scan QR." width="100%">
+</p>
 
-<table width="100%">
-  <tr>
-    <td width="50%" valign="top">
-      <b>Phone</b><br>
-      <sub>FOR YOUR PHONE</sub><br>
-      Send (<b>Transmit</b>) and receive (<b>Retrieve</b>). Tap the round buttons at the bottom or swipe to switch. Both screens have round <b>Show QR</b> and <b>Scan QR</b> buttons: one phone shows the QR, the other scans it.
-    </td>
-    <td width="50%" valign="top">
-      <b>Panel</b><br>
-      <sub>FOR A TABLET OR CLASSROOM SMART BOARD</sub><br>
-      Only receives. A big QR code waits on screen; anyone scans it with F3Nyx and sends. Files arrive in a <b>Received today</b> list.
-    </td>
-  </tr>
-</table>
-
-**Back-to-back sending:** the panel keeps the same code for 10 minutes and is ready again within seconds after each file. Your phone remembers the panel, so you can send file after file without scanning again.<br>
-**To send to a smart board:** on your phone, open Transmit, tap **Scan QR**, then choose the file.
+<sub>Switch layouts with the phone / panel switch in the centre of the top bar.</sub>
 
 <details>
 <summary><b>Panel buttons</b></summary>
@@ -137,43 +123,19 @@ A small switch in the centre of the top bar, with a phone icon and a panel icon,
 
 ## What It Can Do
 
-<table width="100%">
-  <tr>
-    <td width="50%" valign="top"><b>Send anything</b><br><sub>Files, whole folders or a piece of text</sub></td>
-    <td width="50%" valign="top"><b>Show QR or Scan QR</b><br><sub>Either phone can show the QR; files land in <code>Downloads/F3Nyx</code></sub></td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top"><b>Progress ring</b><br><sub>Fills red → yellow → green, with speed and time left</sub></td>
-    <td width="50%" valign="top"><b>Big files</b><br><sub>10 GB and more, without the app closing</sub></td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top"><b>Notifications</b><br><sub>Progress and Cancel, then Open or Share when files arrive</sub></td>
-    <td width="50%" valign="top"><b>Share all</b><br><sub>Share every received file at once</sub></td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top"><b>Send now, collect later</b><br><sub>A locked copy the other person downloads later from a link</sub></td>
-    <td width="50%" valign="top"><b>History</b><br><sub>Everything sent and received, with favourites</sub></td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top"><b>Share button</b><br><sub>Send straight from your gallery or file manager</sub></td>
-    <td width="50%" valign="top"><b>Finish animation</b><br><sub>A short lift-off or landing in its own card; tap to skip</sub></td>
-  </tr>
-  <tr>
-    <td width="50%" valign="top"><b>Themes</b><br><sub>System, Light, Dark and Monet (wallpaper colours)</sub></td>
-    <td width="50%" valign="top"><b>Languages</b><br><sub>English, Español, हिन्दी, 简体中文, 繁體中文</sub></td>
-  </tr>
-</table>
+<p align="center">
+  <img src="assets/features.png" alt="Send anything; Show QR or Scan QR; progress ring; 10 GB+ files; notifications; share all; send now, collect later; history; share button; finish animation; themes; 5 languages" width="100%">
+</p>
+
+<sub>Received files are saved in <code>Downloads/F3Nyx</code>.</sub>
 
 ---
 
 ## Which Version to Download
 
-| Version | Size | Choose it if |
-|:--|:--|:--|
-| **Standard** | about 16 MB | You send to people who may have an older app. It works with old and new versions. Best for smart boards. |
-| **Lite** | about 12 MB | Everyone has an up-to-date app and you want a smaller download. |
-
-Both look and work the same. You can install one over the other.
+<p align="center">
+  <img src="assets/versions.png" alt="Standard, 16 MB: works with old and new croc, best for smart boards; pick this if unsure. Lite, 12 MB: newest croc only, smaller download. Both look and work the same; install one over the other any time." width="100%">
+</p>
 
 ---
 
