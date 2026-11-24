@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -86,7 +87,7 @@ fun TransferProgressCard(
         ) {
             when (state) {
                 is CrocTransferState.Preparing -> {
-                    ReactorGauge(progress = null, label = "LINKING", modifier = Modifier.align(Alignment.CenterHorizontally))
+                    ReactorGauge(progress = null, label = stringResource(R.string.gauge_connecting), modifier = Modifier.align(Alignment.CenterHorizontally))
                     TransferHeader(
                         icon = if (isSending) Icons.Rounded.CloudUpload else Icons.Rounded.Download,
                         iconTint = MaterialTheme.colorScheme.primary,
@@ -98,7 +99,7 @@ fun TransferProgressCard(
                 }
 
                 is CrocTransferState.WaitingForPeer -> {
-                    ReactorGauge(progress = null, label = "LINKING", modifier = Modifier.align(Alignment.CenterHorizontally))
+                    ReactorGauge(progress = null, label = stringResource(R.string.gauge_connecting), modifier = Modifier.align(Alignment.CenterHorizontally))
                     TransferHeader(
                         icon = if (isSending) Icons.Rounded.CloudUpload else Icons.Rounded.Download,
                         iconTint = MaterialTheme.colorScheme.primary,
@@ -139,23 +140,23 @@ fun TransferProgressCard(
 
                     ReactorGauge(
                         progress = animatedProgress,
-                        label = if (isSending) "TRANSMITTING" else "RETRIEVING",
+                        label = stringResource(if (isSending) R.string.gauge_sending else R.string.gauge_receiving),
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
 
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         GaugeStat(
-                            label = "Speed",
+                            label = stringResource(R.string.stat_speed),
                             value = if (state.speedBytesPerSec > 0) formatBytes(state.speedBytesPerSec) + "/s" else "--",
                             modifier = Modifier.weight(1f)
                         )
                         GaugeStat(
-                            label = if (isSending) "Sent" else "Received",
+                            label = stringResource(if (isSending) R.string.stat_sent else R.string.stat_received),
                             value = formatBytes(state.bytesTransferred) + " / " + formatBytes(state.totalBytes),
                             modifier = Modifier.weight(1.4f)
                         )
                         GaugeStat(
-                            label = "Left",
+                            label = stringResource(R.string.stat_left),
                             value = if (state.etaSeconds > 0) "%02d:%02d".format(state.etaSeconds / 60, state.etaSeconds % 60) else "--",
                             modifier = Modifier.weight(0.8f)
                         )
@@ -170,7 +171,18 @@ fun TransferProgressCard(
                 }
 
                 is CrocTransferState.Completed -> {
-                    ReactorGauge(progress = 1f, label = "COMPLETE", complete = true, size = 160.dp, modifier = Modifier.align(Alignment.CenterHorizontally))
+                    // Stage: the suit plays here (inside the card), then the finished gauge stays.
+                    val playing = suitPlaying(source = System.identityHashCode(state))
+                    androidx.compose.foundation.layout.Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(if (playing) 250.dp else 160.dp)
+                            .clip(MaterialTheme.shapes.large),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (playing) SuitScene(modifier = Modifier.fillMaxSize(), suitW = 112.dp, bottomGap = 8.dp)
+                        else ReactorGauge(progress = 1f, label = stringResource(R.string.gauge_done), complete = true, size = 160.dp)
+                    }
                     val count = state.fileCount
                     val subtitle = buildString {
                         append("$count file${if (count != 1) "s" else ""} — ${formatBytes(state.totalBytes)}")

@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * Card heading with a small numbered circle: ① Files, ② Code, …
@@ -51,14 +52,14 @@ fun StepTitle(
             modifier = Modifier
                 .size(24.dp)
                 .clip(CircleShape)
-                .border(1.dp, Color(0xFF3A3A42), CircleShape),
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = number.toString().padStart(2, '0'),
                 style = MaterialTheme.typography.labelSmall,
                 fontFamily = com.dking.crocapp.ui.theme.MonoFamily,
-                color = Color(0xFFC8C8CE)
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
         Spacer(modifier = Modifier.width(10.dp))
@@ -136,42 +137,71 @@ fun PickTarget(
     }
 }
 
+
+
+
 /**
- * Full-width main action pinned at the bottom of Send / Receive
- * (replaces the floating button, so it never covers content).
+ * Large thin summary for picked files: "03 FILES   2.4 GB".
+ * [size] is a formatted size such as "2.4 GB"; the number and unit are styled apart.
  */
 @Composable
-fun PrimaryActionBar(
-    text: String,
-    icon: ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    contentColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
-) {
+fun BigCount(count: Int, size: String, modifier: Modifier = Modifier) {
+    val cs = MaterialTheme.colorScheme
+    val num = size.substringBefore(' ')
+    val unit = size.substringAfter(' ', "")
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.Bottom, modifier = Modifier.fillMaxWidth()) {
+            Text(
+                text = count.toString().padStart(2, '0'),
+                fontFamily = com.dking.crocapp.ui.theme.MonoFamily,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Light,
+                fontSize = 56.sp, letterSpacing = (-2).sp, lineHeight = 56.sp,
+                color = cs.onSurface
+            )
+            Spacer(Modifier.width(8.dp))
+            Text(
+                text = androidx.compose.ui.res.pluralStringResource(com.dking.crocapp.R.plurals.big_files, count).uppercase(),
+                fontFamily = com.dking.crocapp.ui.theme.MonoFamily, fontSize = 11.sp, letterSpacing = 3.sp,
+                color = cs.onSurfaceVariant, modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Spacer(Modifier.weight(1f))
+            Text(
+                text = num,
+                fontFamily = com.dking.crocapp.ui.theme.MonoFamily,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Light,
+                fontSize = 36.sp, letterSpacing = (-1).sp, lineHeight = 36.sp,
+                color = cs.onSurface, modifier = Modifier.padding(bottom = 2.dp)
+            )
+            if (unit.isNotEmpty()) {
+                Spacer(Modifier.width(6.dp))
+                Text(
+                    text = unit.uppercase(),
+                    fontFamily = com.dking.crocapp.ui.theme.MonoFamily, fontSize = 11.sp, letterSpacing = 3.sp,
+                    color = cs.onSurfaceVariant, modifier = Modifier.padding(bottom = 8.dp)
+                )
+            }
+        }
+        Spacer(Modifier.height(10.dp))
+        androidx.compose.material3.HorizontalDivider(color = cs.outlineVariant.copy(alpha = 0.6f))
+    }
+}
+
+
+/** The numbered ring used by step titles ("01"), on its own. */
+@Composable
+fun StepNumber(number: Int, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .size(30.dp)
+            .clip(CircleShape)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, CircleShape),
+        contentAlignment = Alignment.Center
     ) {
-        Button(
-            onClick = onClick,
-            enabled = enabled,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = MaterialTheme.shapes.extraLarge,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = containerColor,
-                contentColor = contentColor
-            ),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
-            contentPadding = PaddingValues(horizontal = 20.dp)
-        ) {
-            Icon(icon, contentDescription = null, modifier = Modifier.size(20.dp))
-            Spacer(modifier = Modifier.width(10.dp))
-            Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-        }
+        Text(
+            text = number.toString().padStart(2, '0'),
+            style = MaterialTheme.typography.labelSmall,
+            fontFamily = com.dking.crocapp.ui.theme.MonoFamily,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }

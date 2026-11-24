@@ -225,41 +225,13 @@ fun SendScreen(
         animationSpec = tween(400),
         label = "borderProgress"
     )
-    val showFileBorder = isTransferActive || isDirectCompleted || isStoreCompleted
+    val showFileBorder = false // progress now lives in the Stage card below
     val borderColor = MaterialTheme.colorScheme.primary
 
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        com.dking.crocapp.ui.components.LogoMark(modifier = Modifier.padding(end = 10.dp).size(28.dp))
-                        Text(
-                            stringResource(R.string.nav_send),
-                            fontWeight = FontWeight.Bold
-                        )
-                        com.dking.crocapp.ui.components.ModeDot(modifier = Modifier.padding(start = 4.dp))
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToGuide) {
-                        Icon(Icons.AutoMirrored.Outlined.HelpOutline, contentDescription = stringResource(R.string.guide_title))
-                    }
-                    IconButton(onClick = onNavigateToHistory) {
-                        Icon(Icons.Outlined.History, contentDescription = stringResource(R.string.nav_history))
-                    }
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.nav_settings))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = Color.Transparent
-                ),
-                // The app's outer Scaffold already pads for the status bar.
-                windowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
-            )
+            com.dking.crocapp.ui.components.AppTopBar(onHistory = onNavigateToHistory, onSettings = onNavigateToSettings)
         },
         bottomBar = {
             // ③ Full-width main action. It sits below the content (never
@@ -302,63 +274,30 @@ fun SendScreen(
         ) {
             Spacer(modifier = Modifier.height(2.dp))
 
-            // Mode Toggle: Files / Folder / Text (Store mode only supports Files & Text)
-            if (uiState.isStoreMode) {
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
-                        onClick = { viewModel.setSendMode(SendMode.FILES) },
-                        selected = uiState.sendMode == SendMode.FILES,
-                        icon = {
-                            Icon(Icons.Rounded.AttachFile, contentDescription = null, modifier = Modifier.size(18.dp))
-                        }
-                    ) {
-                        Text(stringResource(R.string.send_mode_files))
-                    }
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
-                        onClick = { viewModel.setSendMode(SendMode.TEXT) },
-                        selected = uiState.sendMode == SendMode.TEXT,
-                        icon = {
-                            Icon(Icons.Outlined.TextFields, contentDescription = null, modifier = Modifier.size(18.dp))
-                        }
-                    ) {
-                        Text(stringResource(R.string.send_mode_text))
-                    }
-                }
-            } else {
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 0, count = 3),
-                        onClick = { viewModel.setSendMode(SendMode.FILES) },
-                        selected = uiState.sendMode == SendMode.FILES,
-                        icon = {
-                            Icon(Icons.Rounded.AttachFile, contentDescription = null, modifier = Modifier.size(18.dp))
-                        }
-                    ) {
-                        Text(stringResource(R.string.send_mode_files))
-                    }
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 1, count = 3),
-                        onClick = { viewModel.setSendMode(SendMode.FOLDER) },
-                        selected = uiState.sendMode == SendMode.FOLDER,
-                        icon = {
-                            Icon(Icons.Rounded.FolderOpen, contentDescription = null, modifier = Modifier.size(18.dp))
-                        }
-                    ) {
-                        Text(stringResource(R.string.send_mode_folder))
-                    }
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 2, count = 3),
-                        onClick = { viewModel.setSendMode(SendMode.TEXT) },
-                        selected = uiState.sendMode == SendMode.TEXT,
-                        icon = {
-                            Icon(Icons.Outlined.TextFields, contentDescription = null, modifier = Modifier.size(18.dp))
-                        }
-                    ) {
-                        Text(stringResource(R.string.send_mode_text))
-                    }
-                }
+            // ──── Card 1: what to send (tabs, content, code, delivery) ────
+            GlassCard(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                shape = MaterialTheme.shapes.extraLarge
+            ) {
+            androidx.compose.runtime.CompositionLocalProvider(com.dking.crocapp.ui.components.LocalFlatCards provides true) {
+            Column(modifier = Modifier.padding(top = 12.dp)) {
+            Column(modifier = Modifier.padding(horizontal = 12.dp)) {
+            // Files / Folder / Text: icon-only switch with a sliding bubble (Store: Files & Text).
+            val modeTabs = buildList {
+                add(SendMode.FILES to com.dking.crocapp.ui.components.IconTab(Icons.AutoMirrored.Rounded.InsertDriveFile, stringResource(R.string.send_mode_files)))
+                if (!uiState.isStoreMode) add(SendMode.FOLDER to com.dking.crocapp.ui.components.IconTab(Icons.Rounded.FolderOpen, stringResource(R.string.send_mode_folder)))
+                add(SendMode.TEXT to com.dking.crocapp.ui.components.IconTab(Icons.Outlined.TextFields, stringResource(R.string.send_mode_text)))
+            }
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                com.dking.crocapp.ui.components.IconSwitch(
+                    tabs = modeTabs.map { it.second },
+                    selected = modeTabs.indexOfFirst { it.first == uiState.sendMode }.coerceAtLeast(0),
+                    onSelect = { i -> viewModel.setSendMode(modeTabs[i].first) },
+                    enabled = !isTransferActive
+                )
+            }
+
             }
 
             // ──── Mode panel: Files / Folder / Text ────
@@ -410,16 +349,14 @@ fun SendScreen(
                         com.dking.crocapp.ui.components.StepTitle(
                             number = 1,
                             title = stringResource(R.string.send_files_title),
-                            trailing = if (uiState.selectedFiles.isNotEmpty()) {
-                                {
-                                    Text(
-                                        text = "${uiState.selectedFiles.size} • ${formatBytes(uiState.selectedBytes)}",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            } else null
+                            trailing = null
                         )
+                        if (uiState.selectedFiles.isNotEmpty()) {
+                            com.dking.crocapp.ui.components.BigCount(
+                                count = uiState.selectedFiles.size,
+                                size = formatBytes(uiState.selectedBytes)
+                            )
+                        }
 
                         if (uiState.selectedFiles.isEmpty()) {
                             com.dking.crocapp.ui.components.PickTarget(
@@ -640,6 +577,11 @@ fun SendScreen(
             } // when
             } // AnimatedContent
 
+            androidx.compose.material3.HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
+
             // ──── Delivery Options: Store Config OR Direct Code Phrase ────
             if (uiState.isStoreMode) {
                 StoreConfigurationCard(
@@ -837,6 +779,53 @@ fun SendScreen(
             }
         }
 
+            // Delivery: Direct (live, peer-to-peer) or Store (upload for later pickup)
+            if (!isTransferActive && !isStoreCompleted) {
+            Column(modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Unselected half stays see-through so only the chosen mode stands out.
+                val deliveryColors = SegmentedButtonDefaults.colors(
+                    inactiveContainerColor = androidx.compose.ui.graphics.Color.Transparent
+                )
+                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
+                        onClick = { viewModel.setDeliveryMode(DeliveryMode.DIRECT) },
+                        selected = !uiState.isStoreMode,
+                        colors = deliveryColors,
+                        icon = {
+                            Icon(Icons.AutoMirrored.Rounded.Send, contentDescription = null, modifier = Modifier.size(16.dp))
+                        }
+                    ) {
+                        Text(stringResource(R.string.send_delivery_direct))
+                    }
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
+                        onClick = { viewModel.setDeliveryMode(DeliveryMode.STORE) },
+                        selected = uiState.isStoreMode,
+                        colors = deliveryColors,
+                        icon = {
+                            Icon(Icons.Rounded.CloudUpload, contentDescription = null, modifier = Modifier.size(16.dp))
+                        }
+                    ) {
+                        Text(stringResource(R.string.send_delivery_store))
+                    }
+                }
+                Text(
+                    text = stringResource(
+                        if (uiState.isStoreMode) R.string.mode_switch_store_desc else R.string.mode_switch_normal_desc
+                    ),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+            }
+            } // Column
+            } // CompositionLocalProvider
+            } // Card 1
+
+            // ──── Card 2: the Stage (progress, result, suit) ────
             // ──── Transfer Progress / Result ────
             AnimatedVisibility(
                 visible = showTransferSection,
@@ -869,41 +858,6 @@ fun SendScreen(
                         }
                     }
                 }
-            }
-
-            // Delivery: Direct (live, peer-to-peer) or Store (upload for later pickup)
-            if (!isTransferActive && !isStoreCompleted) {
-                SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
-                        onClick = { viewModel.setDeliveryMode(DeliveryMode.DIRECT) },
-                        selected = !uiState.isStoreMode,
-                        icon = {
-                            Icon(Icons.AutoMirrored.Rounded.Send, contentDescription = null, modifier = Modifier.size(16.dp))
-                        }
-                    ) {
-                        Text(stringResource(R.string.send_delivery_direct))
-                    }
-                    SegmentedButton(
-                        shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
-                        onClick = { viewModel.setDeliveryMode(DeliveryMode.STORE) },
-                        selected = uiState.isStoreMode,
-                        icon = {
-                            Icon(Icons.Rounded.CloudUpload, contentDescription = null, modifier = Modifier.size(16.dp))
-                        }
-                    ) {
-                        Text(stringResource(R.string.send_delivery_store))
-                    }
-                }
-                Text(
-                    text = stringResource(
-                        if (uiState.isStoreMode) R.string.mode_switch_store_desc else R.string.mode_switch_normal_desc
-                    ),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                )
             }
 
             Spacer(modifier = Modifier.height(8.dp))

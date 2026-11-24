@@ -93,3 +93,44 @@ private fun shareTransferUri(
         false
     }
 }
+
+
+/** Share every received file in one go (ACTION_SEND_MULTIPLE). */
+fun shareAllReceivedFiles(context: Context, files: List<ReceivedFile>): Boolean {
+    val existing = files.filter { doesFileUriExist(context, it.uri) }
+    if (existing.isEmpty()) {
+        Toast.makeText(context, context.getString(R.string.history_file_not_found), Toast.LENGTH_SHORT).show()
+        return false
+    }
+    if (existing.size == 1) return shareReceivedFile(context, existing.first())
+    val types = existing.map { it.mimeType }.distinct()
+    val type = when {
+        types.size == 1 -> types.first()
+        types.all { it.substringBefore('/') == types.first().substringBefore('/') } -> types.first().substringBefore('/') + "/*"
+        else -> "*/*"
+    }
+    val intent = Intent(Intent.ACTION_SEND_MULTIPLE).apply {
+        this.type = type
+        putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(existing.map { it.uri }))
+        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+    }
+    return try {
+        context.startActivity(Intent.createChooser(intent, context.getString(R.string.action_share_file)))
+        true
+    } catch (_: Exception) {
+        false
+    }
+}
+
+/** Open the system Downloads view, where the F3Nyx folder lives. */
+fun openDownloadsFolder(context: Context): Boolean {
+    return try {
+        context.startActivity(
+            Intent(android.app.DownloadManager.ACTION_VIEW_DOWNLOADS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        )
+        true
+    } catch (_: Exception) {
+        Toast.makeText(context, context.getString(R.string.history_file_not_found), Toast.LENGTH_SHORT).show()
+        false
+    }
+}

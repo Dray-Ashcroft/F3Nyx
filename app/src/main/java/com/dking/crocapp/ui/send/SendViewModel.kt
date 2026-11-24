@@ -86,9 +86,11 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
     val uiState: StateFlow<SendUiState> = _uiState.asStateFlow()
 
     init {
+        com.dking.crocapp.service.TransferNotifier.onCancelSend = { cancelTransfer() }
         viewModelScope.launch {
             crocProcess.state.collect { state ->
                 _uiState.update { it.copy(transferState = state) }
+                com.dking.crocapp.service.TransferNotifier.onState(getApplication(), state, sending = true)
 
                 // Save to history on completion and clean up staging cache
                 if (state is CrocTransferState.Completed) {
@@ -256,11 +258,15 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateCodePhrase(code: String) {
-        _uiState.update { it.copy(codePhrase = normalizeCodePhrase(code)) }
+        val c = normalizeCodePhrase(code)
+        if (c != panelCode) panelCode = null // typed or picked another code: forget the panel
+        _uiState.update { it.copy(codePhrase = c) }
     }
 
     fun useCodePhrase(code: String) {
-        _uiState.update { it.copy(codePhrase = normalizeCodePhrase(code)) }
+        val c = normalizeCodePhrase(code)
+        if (c != panelCode) panelCode = null // typed or picked another code: forget the panel
+        _uiState.update { it.copy(codePhrase = c) }
     }
 
     /**
@@ -271,7 +277,24 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
         val code = QrCodeParser.parseCode(raw)
         if (code.isBlank()) return
         setDeliveryMode(DeliveryMode.DIRECT)
-        _uiState.update { it.copy(codePhrase = normalizeCodePhrase(code)) }
+        val normalized = normalizeCodePhrase(code)
+        // A panel keeps its code for 10 minutes; a phone's Show QR is good for one transfer.
+        if (QrCodeParser.isOneTimeLink(raw)) {
+            panelCode = null
+        } else {
+            panelCode = normalized
+            panelCodeAt = System.currentTimeMillis()
+        }
+        _uiState.update { it.copy(codePhrase = normalized) }
+    }
+
+    // A panel keeps its code for 10 minutes, so after a send we keep using it:
+    // "send more" works without scanning again.
+    private var panelCode: String? = null
+    private var panelCodeAt = 0L
+    private fun livePanelCode(): String? {
+        val c = panelCode ?: return null
+        return if (System.currentTimeMillis() - panelCodeAt < 10 * 60_000L) c else null.also { panelCode = null }
     }
 
     fun saveCurrentCode() {
@@ -281,6 +304,7 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun regenerateCode() {
+        panelCode = null
         _uiState.update { it.copy(codePhrase = CodePhraseGenerator.generate()) }
     }
 
@@ -454,7 +478,10 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
     fun dismissTransferResult() {
         crocProcess.reset()
         StorageCleaner.cleanSendStaging(getApplication<CrocApp>())
-        if (_uiState.value.defaultCodePhrase.isBlank()) {
+        val panel = livePanelCode()
+        if (panel != null) {
+            _uiState.update { it.copy(codePhrase = panel) }
+        } else if (_uiState.value.defaultCodePhrase.isBlank()) {
             _uiState.update { it.copy(codePhrase = CodePhraseGenerator.generate()) }
         }
     }
@@ -470,7 +497,7 @@ class SendViewModel(application: Application) : AndroidViewModel(application) {
             it.copy(
                 selectedFiles = emptyList(),
                 selectedBytes = 0,
-                codePhrase = it.defaultCodePhrase.ifBlank { CodePhraseGenerator.generate() },
+                codePhrase = livePanelCode() ?: it.defaultCodePhrase.ifBlank { CodePhraseGenerator.generate() },
                 textToSend = "",
                 selectedFolderName = null,
                 selectedFolderFileCount = 0,

@@ -32,6 +32,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.HelpOutline
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Cloud
 import androidx.compose.material.icons.rounded.CloudUpload
@@ -102,7 +103,8 @@ private const val MAX_VISIBLE_CODES = 6
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel = viewModel(),
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onNavigateToGuide: () -> Unit = {}
 ) {
     val prefs by viewModel.preferences.collectAsStateWithLifecycle()
     val context = LocalContext.current
@@ -124,6 +126,12 @@ fun SettingsScreen(
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Rounded.ArrowBack, contentDescription = stringResource(R.string.action_back))
+                    }
+                },
+                actions = {
+                    // Help moved here from the main screens, which keep only History and Settings.
+                    IconButton(onClick = onNavigateToGuide) {
+                        Icon(Icons.AutoMirrored.Outlined.HelpOutline, contentDescription = stringResource(R.string.guide_title))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -186,12 +194,29 @@ fun SettingsScreen(
 
             // Appearance
             SettingsSection(icon = Icons.Rounded.Palette, title = stringResource(R.string.settings_appearance)) {
+                val themeNames = mapOf(
+                    "system" to stringResource(R.string.settings_theme_system),
+                    "light" to stringResource(R.string.settings_theme_light),
+                    "dark" to stringResource(R.string.settings_theme_dark),
+                    "monet" to stringResource(R.string.theme_monet)
+                )
                 DropdownSetting(
                     label = stringResource(R.string.settings_theme_label),
                     value = prefs.themeMode,
-                    options = listOf("system", "light", "dark"),
-                    onValueChange = { viewModel.updateThemeMode(it) }
+                    // Monet needs Android 12+ (wallpaper colours).
+                    options = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+                        listOf("system", "light", "dark", "monet") else listOf("system", "light", "dark"),
+                    onValueChange = { viewModel.updateThemeMode(it) },
+                    displayTransform = { themeNames[it] ?: it }
                 )
+                if (prefs.themeMode == "monet") {
+                    Text(
+                        stringResource(R.string.theme_monet_desc),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(start = 4.dp, bottom = 4.dp)
+                    )
+                }
                 HorizontalDivider(
                     modifier = Modifier.padding(vertical = 2.dp),
                     color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.4f)

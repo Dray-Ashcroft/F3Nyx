@@ -131,14 +131,17 @@ tasks.configureEach {
 
 android {
     namespace = "com.dking.crocapp"
+    testOptions {
+        unitTests.isIncludeAndroidResources = true
+    }
     compileSdk = 35
 
     defaultConfig {
         applicationId = "com.drayashcroft.fenyx"
         minSdk = 26
         targetSdk = 35
-        versionCode = 15
-        versionName = "7.1.0"
+        versionCode = 31
+        versionName = "7.6.7"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -257,8 +260,21 @@ dependencies {
 
     // Testing
     testImplementation("junit:junit:4.13.2")
+    // README screenshots rendered on the JVM (Robolectric native graphics)
+    testImplementation("org.robolectric:robolectric:4.14.1")
+    testImplementation(composeBom)
+    testImplementation("androidx.compose.ui:ui-test-junit4")
+    testImplementation("androidx.test:core:1.6.1")
 
     // Debug
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+}
+
+tasks.withType<Test>().configureEach {
+    systemProperty("shots.dir", rootProject.file("shots").absolutePath)
+    systemProperty("shots.landMs", (project.findProperty("landMs") ?: "2600").toString())
+    systemProperty("robolectric.dependency.repo.url", "https://maven-central.storage-download.googleapis.com/maven2/")
+    // The README screenshot test is slow and only runs when asked for.
+    if (!project.hasProperty("shots")) filter { excludeTestsMatching("*ReadmeShots*") }
 }

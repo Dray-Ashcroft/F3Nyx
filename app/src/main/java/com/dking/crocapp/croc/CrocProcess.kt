@@ -558,7 +558,7 @@ class CrocProcess(
             CrocTransferState.LegacyFallbackAvailable(room = room)
         } else {
             CrocTransferState.Error(
-                "The other device uses an older croc version. Ask them to update, or use the Standard edition of FeNyx, which includes the Legacy engine."
+                "The other device uses an older croc version. Ask them to update, or use the Standard edition of F3Nyx, which includes the Legacy engine."
             )
         }
 

@@ -93,10 +93,27 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
+    // Transfer progress and "Retrieved" notifications need this on Android 13+. Asked once.
+    private val notifPermission = registerForActivityResult(
+        androidx.activity.result.contract.ActivityResultContracts.RequestPermission()
+    ) { }
+
+    private fun askNotificationsOnce() {
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.TIRAMISU) return
+        val granted = androidx.core.content.ContextCompat.checkSelfPermission(
+            this, android.Manifest.permission.POST_NOTIFICATIONS
+        ) == android.content.pm.PackageManager.PERMISSION_GRANTED
+        val prefs = getSharedPreferences("fenyx_ui", MODE_PRIVATE)
+        if (granted || prefs.getBoolean("notif_asked", false)) return
+        prefs.edit().putBoolean("notif_asked", true).apply()
+        notifPermission.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        askNotificationsOnce()
 
         val sharedContent = handleShareIntent(intent)
         val binaryManager = (application as CrocApp).binaryManager
@@ -109,12 +126,13 @@ class MainActivity : AppCompatActivity() {
             val isDark = when (prefs.themeMode) {
                 "dark" -> true
                 "light" -> false
-                else -> isSystemInDarkTheme()
+                else -> isSystemInDarkTheme() // "system" and "monet" follow the phone
             }
 
             CrocTheme(
                 darkTheme = isDark,
-                amoledDark = prefs.amoledDark
+                amoledDark = prefs.amoledDark,
+                monet = prefs.themeMode == "monet"
             ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -173,7 +191,7 @@ class MainActivity : AppCompatActivity() {
                 when {
                     code.isEmpty() -> SharedContent.None
                     // A panel's QR: the panel receives, so this phone sends.
-                    QrCodeParser.isSendDeepLink(rawData) -> SharedContent.SendCode(code)
+                    QrCodeParser.isSendDeepLink(rawData) -> SharedContent.SendCode(rawData)
                     else -> SharedContent.ReceiveCode(code)
                 }
             }
@@ -440,6 +458,9 @@ fun CrocApp(
                     viewModel = settingsViewModel,
                     onNavigateBack = {
                         navController.popBackStack()
+                    },
+                    onNavigateToGuide = {
+                        navController.navigate(CrocDestination.Guide.route)
                     }
                 )
             }

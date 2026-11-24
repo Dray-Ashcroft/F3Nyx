@@ -34,8 +34,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -76,6 +81,12 @@ fun RegisterDockAction(
 
 private val GlassFill = Color(0xB81C1C20)
 private val GlassEdge = Color(0x12FFFFFF)
+// Light-mode glass: frosted white with a soft grey edge.
+private val GlassFillLight = Color(0xD9FFFFFF)
+private val GlassEdgeLight = Color(0x1F000000)
+
+@Composable
+private fun isLight() = MaterialTheme.colorScheme.surface.luminance() > 0.5f
 
 /** Round glass button: grey (secondary) or red (primary). Icon only; [label] is read by screen readers. */
 @Composable
@@ -89,22 +100,26 @@ fun GlassRoundButton(
     size: Dp = if (primary) 64.dp else 56.dp
 ) {
     val a by animateFloatAsState(if (enabled) 1f else 0.45f, tween(200), label = "enabled")
-    val fill = if (primary) {
-        Brush.linearGradient(listOf(Color(0xEBE5484D), Color(0xEB8F1C16)))
-    } else {
-        Brush.linearGradient(listOf(Color(0xCC2C2C32), Color(0xCC1E1E22)))
+    val light = isLight()
+    val monet = com.dking.crocapp.ui.theme.LocalMonet.current
+    val p = MaterialTheme.colorScheme.primary
+    val fill = when {
+        primary && monet -> Brush.linearGradient(listOf(p.copy(alpha = 0.95f), androidx.compose.ui.graphics.lerp(p, Color.Black, 0.35f).copy(alpha = 0.95f)))
+        primary -> Brush.linearGradient(listOf(Color(0xEBE5484D), Color(0xEB8F1C16)))
+        light -> Brush.linearGradient(listOf(Color(0xF2FFFFFF), Color(0xE6F1F1F4)))
+        else -> Brush.linearGradient(listOf(Color(0xCC2C2C32), Color(0xCC1E1E22)))
     }
     Surface(
         onClick = onClick,
         enabled = enabled,
         shape = CircleShape,
         color = Color.Transparent,
-        contentColor = Color.White,
-        border = BorderStroke(1.dp, if (primary) Color(0x2EFFFFFF) else Color(0x1AFFFFFF)),
+        contentColor = if (primary && monet) MaterialTheme.colorScheme.onPrimary else if (primary || !light) Color.White else Color(0xFF2A2A30),
+        border = BorderStroke(1.dp, when { primary -> Color(0x2EFFFFFF); light -> GlassEdgeLight; else -> Color(0x1AFFFFFF) }),
         modifier = modifier
             .size(size)
             .alpha(a)
-            .shadow(if (primary) 14.dp else 8.dp, CircleShape, ambientColor = if (primary) Color(0xFFB3261E) else Color.Black, spotColor = if (primary) Color(0xFFB3261E) else Color.Black)
+            .shadow(if (primary) 14.dp else 8.dp, CircleShape, ambientColor = if (primary) (if (monet) p else Color(0xFFB3261E)) else Color.Black, spotColor = if (primary) (if (monet) p else Color(0xFFB3261E)) else Color.Black)
             .semantics { contentDescription = label }
     ) {
         Box(Modifier.background(fill), contentAlignment = Alignment.Center) {
@@ -127,6 +142,7 @@ fun HomeDock(
     modifier: Modifier = Modifier
 ) {
     val action = DockActions.actions[actionKey]
+    val light = isLight()
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -135,16 +151,27 @@ fun HomeDock(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        val density = LocalDensity.current
+        val drop = rememberDroplet()
+        val ring = if (light) Color(0xFF6B6B73) else Color(0xFFB0B0B8)
+        fun tap(i: Int) {
+            if (i != selected) {
+                with(density) { drop.drop(Offset((6 + i * 60 + 26).dp.toPx(), (6 + 26).dp.toPx()), i) }
+            }
+            onSelect(i)
+        }
         Row(
             modifier = Modifier
                 .shadow(12.dp, RoundedCornerShape(40.dp), ambientColor = Color.Black, spotColor = Color.Black)
-                .background(GlassFill, RoundedCornerShape(40.dp))
-                .border(1.dp, GlassEdge, RoundedCornerShape(40.dp))
+                .background(if (light) GlassFillLight else GlassFill, RoundedCornerShape(40.dp))
+                .border(1.dp, if (light) GlassEdgeLight else GlassEdge, RoundedCornerShape(40.dp))
+                .clip(RoundedCornerShape(40.dp))
+                .dropletRings(drop, ring, with(density) { 64.dp.toPx() })
                 .padding(6.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            TabCircle(Icons.Rounded.ArrowUpward, transmitLabel, selected == 0) { onSelect(0) }
-            TabCircle(Icons.Rounded.ArrowDownward, retrieveLabel, selected == 1) { onSelect(1) }
+            TabCircle(Icons.Rounded.ArrowUpward, transmitLabel, selected == 0, Modifier.dropletSquash(drop, 0)) { tap(0) }
+            TabCircle(Icons.Rounded.ArrowDownward, retrieveLabel, selected == 1, Modifier.dropletSquash(drop, 1)) { tap(1) }
         }
         AnimatedVisibility(
             visible = action != null,
@@ -166,14 +193,14 @@ fun HomeDock(
 }
 
 @Composable
-private fun TabCircle(icon: ImageVector, label: String, selected: Boolean, onClick: () -> Unit) {
+private fun TabCircle(icon: ImageVector, label: String, selected: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         shape = CircleShape,
-        color = if (selected) Color(0xFF2A2A30) else Color.Transparent,
-        contentColor = if (selected) Color(0xFFF2F2F3) else Color(0xFF8A8A92),
-        border = if (selected) BorderStroke(1.dp, Color(0x1AFFFFFF)) else null,
-        modifier = Modifier
+        color = when { !selected -> Color.Transparent; com.dking.crocapp.ui.theme.LocalMonet.current -> MaterialTheme.colorScheme.secondaryContainer; isLight() -> Color(0xFFECECEF); else -> Color(0xFF2A2A30) },
+        contentColor = when { selected && com.dking.crocapp.ui.theme.LocalMonet.current -> MaterialTheme.colorScheme.onSecondaryContainer; selected && isLight() -> Color(0xFF1B1B1F); selected -> Color(0xFFF2F2F3); isLight() -> Color(0xFF6B6B73); else -> Color(0xFF8A8A92) },
+        border = if (selected) BorderStroke(1.dp, if (isLight()) GlassEdgeLight else Color(0x1AFFFFFF)) else null,
+        modifier = modifier
             .size(52.dp)
             .semantics { contentDescription = label }
     ) {

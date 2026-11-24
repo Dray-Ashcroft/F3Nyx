@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FeNyx</string>
+    <string name="app_name">F3Nyx</string>
 
     <!-- ════ Common / General ════ -->
     <string name="action_cancel">Cancel</string>
@@ -121,7 +121,7 @@
     <string name="send_share_code">Share code</string>
     <string name="send_regenerate">Regenerate</string>
     <string name="send_again">Transmit again</string>
-    <string name="send_share_code_subject">FeNyx code</string>
+    <string name="send_share_code_subject">F3Nyx code</string>
 
     <!-- ════ Receive Screen ════ -->
     <string name="receive_title">Retrieve</string>
@@ -139,7 +139,7 @@
     <string name="receive_copy_text">Copy text</string>
     <string name="receive_open_file">Open</string>
     <string name="receive_share_file">Share</string>
-    <string name="receive_code_share_subject">FeNyx code</string>
+    <string name="receive_code_share_subject">F3Nyx code</string>
     <string name="receive_code_share_chooser">Share code</string>
     <string name="receive_on_code">Retrieve on code</string>
 
@@ -227,12 +227,12 @@
 
     <string name="settings_storage">Storage</string>
     <string name="settings_receive_location">Save location</string>
-    <string name="settings_receive_location_default">Downloads/FeNyx (default)</string>
+    <string name="settings_receive_location_default">Downloads/F3Nyx (default)</string>
     <string name="settings_receive_location_custom">Custom folder</string>
     <string name="settings_choose_folder">Choose Folder</string>
     <string name="settings_change_folder">Change</string>
     <string name="settings_reset_folder">Reset</string>
-    <string name="settings_receive_location_desc">Where received files are saved. Default is Downloads/FeNyx.</string>
+    <string name="settings_receive_location_desc">Where received files are saved. Default is Downloads/F3Nyx.</string>
 
     <string name="settings_about">About</string>
     <string name="settings_app_version">App Version</string>
@@ -548,14 +548,14 @@
     <string name="panel_new_code_now">New code</string>
     <string name="panel_last_received">Last received</string>
     <string name="send_scan_qr">Scan QR</string>
-    <string name="send_scan_panel_qr">Scan panel QR</string>
+    <string name="send_scan_panel_qr">Scan QR</string>
     <string name="send_tap_to_pick_files">Tap to pick files</string>
     <string name="send_tap_to_pick_folder">Tap to pick a folder</string>
     <string name="send_pick_hint">Photos, videos, documents — anything</string>
     <string name="send_delivery_direct">Direct</string>
     <string name="send_delivery_store">Store</string>
     <string name="action_more_options">More options</string>
-    <string name="receive_scan_sender_qr">Scan QR instead</string>
+    <string name="receive_scan_sender_qr">Scan QR</string>
     <string name="receive_or_type">or type the code</string>
     <string name="receive_hint">Get the code or QR from the transmitting device</string>
     <string name="receive_clear_all">Clear</string>
@@ -564,9 +564,79 @@
     <string name="mode_dot_a11y">Mode: %1$s. Hold to switch.</string>
     <string name="mode_summoned_meko">Jarvis online</string>
     <string name="mode_summoned_rimas">Friday online</string>
-    <string name="settings_header_mode">FeNyx · %1$s</string>
+    <string name="settings_header_mode">F3Nyx · %1$s</string>
     <string name="settings_effects_full">Full effects</string>
     <string name="settings_effects_full_desc">Animated mode switch and gauge motion. Turn off for a calmer, faster app.</string>
     <string name="menu_use_legacy_engine">Use Legacy engine</string>
     <string name="menu_use_latest_engine">Use Latest engine</string>
+    <plurals name="big_files">
+        <item quantity="one">file</item>
+        <item quantity="other">files</item>
+    </plurals>
+    <string name="action_share_all">Share all</string>
+    <string name="action_open_folder">Folder</string>
+    <string name="notif_channel_progress">Transfer progress</string>
+    <string name="notif_channel_done">Finished transfers</string>
+    <string name="notif_transmitting">Transmitting</string>
+    <string name="notif_retrieving">Retrieving</string>
+    <string name="notif_of">%1$s of %2$s</string>
+    <string name="notif_sent_size">%1$s sent</string>
+    <string name="notif_saved_to">Saved to Downloads/F3Nyx · %1$s</string>
+    <string name="notif_open">Open</string>
+    <string name="notif_share">Share</string>
+    <string name="notif_eta_seconds">%1$d s left</string>
+    <string name="notif_eta_minutes">%1$d min left</string>
+    <string name="notif_eta_hours">%1$d h %2$d min left</string>
+    <plurals name="notif_retrieved">
+        <item quantity="one">Retrieved · %1$d file</item>
+        <item quantity="other">Retrieved · %1$d files</item>
+    </plurals>
+    <plurals name="notif_transmitted">
+        <item quantity="one">Transmitted · %1$d file</item>
+        <item quantity="other">Transmitted · %1$d files</item>
+    </plurals>
+    <string name="mode_short_meko">Jarvis</string>
+    <string name="mode_short_rimas">Friday</string>
+    <string name="mode_header_a11y">%1$s, %2$s. Press and hold to switch mode.</string>
+    <string name="gauge_connecting">Connecting</string>
+    <string name="gauge_sending">Sending</string>
+    <string name="gauge_receiving">Receiving</string>
+    <string name="gauge_done">Done</string>
+    <string name="stat_speed">Speed</string>
+    <string name="stat_sent">Sent</string>
+    <string name="stat_received">Received</string>
+    <string name="stat_left">Left</string>
+    <string name="panel_pill_ready">Ready · %1$d min</string>
+    <string name="panel_pill_receiving">Receiving</string>
+    <string name="panel_big_qr">Big QR</string>
+    <string name="panel_animation_on">Animation on</string>
+    <string name="panel_animation_off">Animation off</string>
+    <string name="panel_ready_next">Ready for the next file · same code</string>
+    <string name="panel_steps_title">Send to this board</string>
+    <string name="panel_step_1">Open F3Nyx on your phone, then Transmit</string>
+    <string name="panel_step_2">Tap Scan panel QR and point at the code</string>
+    <string name="panel_step_3">Pick files and send. Send again any time</string>
+    <string name="panel_received_today">Received today</string>
+    <string name="panel_tab_files">Files · %1$d</string>
+    <string name="panel_tab_text">Text · %1$d</string>
+    <string name="panel_none_files">Files sent to this board appear here.</string>
+    <string name="panel_none_text">Text sent to this board appears here.</string>
+    <string name="panel_copy_text">Copy text</string>
+    <string name="panel_scan_with">Scan with F3Nyx</string>
+    <string name="layout_phone">Phone layout</string>
+    <string name="layout_panel">Panel layout</string>
+    <string name="theme_monet">Monet (wallpaper colours)</string>
+    <string name="theme_monet_desc">Accent colours come from your wallpaper. Backgrounds stay neutral; light or dark follows the phone.</string>
+    <string name="panel_waiting_hint">Scan the QR with F3Nyx to send</string>
+    <string name="panel_help_show">How to send to this board</string>
+    <string name="panel_help_hide">Hide steps</string>
+    <string name="receive_show_qr">Show QR</string>
+    <string name="receive_hint_show">this phone shows a QR and waits. The sender scans it from Transmit.</string>
+    <string name="receive_hint_scan">the sender shows a QR; scan it with this phone.</string>
+    <string name="receive_qr_help_show">What these buttons do</string>
+    <string name="receive_qr_help_hide">Hide help</string>
+    <string name="receive_qr_waiting">Waiting for the sender…</string>
+    <string name="receive_qr_steps">On the sending phone: Transmit → pick files → Scan QR. This closes by itself when the transfer starts.</string>
+    <string name="receive_qr_title">Retrieve</string>
+    <string name="receive_code_copied">Code copied</string>
 </resources>

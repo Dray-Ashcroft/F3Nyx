@@ -1,5 +1,13 @@
 package com.dking.crocapp.ui.receive
 
+import androidx.compose.material.icons.rounded.QrCode
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.animation.core.animateFloat
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -32,6 +40,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.InsertDriveFile
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Settings
@@ -127,6 +136,8 @@ fun ReceiveScreen(
     var hideCodePhrase by remember { mutableStateOf(false) }
     var showCodeMenu by remember { mutableStateOf(false) }
     var showAllFiles by remember { mutableStateOf(false) }
+    var showQr by remember { mutableStateOf(false) }
+    var showQrHelp by remember { mutableStateOf(false) }
     val codeFocusRequester = remember { FocusRequester() }
     var highlightCodeInput by remember { mutableStateOf(false) }
 
@@ -156,6 +167,23 @@ fun ReceiveScreen(
             uiState.transferState is CrocTransferState.Error ||
             uiState.transferState is CrocTransferState.Cancelled
     val isLegacyFallback = uiState.transferState is CrocTransferState.LegacyFallbackAvailable
+    val isWaitingForQr = uiState.transferState is CrocTransferState.Preparing ||
+            uiState.transferState is CrocTransferState.WaitingForPeer
+    // The QR closes by itself once the sender connects (or anything else ends the wait).
+    LaunchedEffect(uiState.transferState) {
+        if (showQr && !isWaitingForQr && uiState.transferState !is CrocTransferState.Idle) showQr = false
+    }
+    if (showQr && uiState.codePhrase.isNotBlank()) {
+        ShowQrDialog(
+            code = uiState.codePhrase,
+            onNewCode = { viewModel.showQrAndWait() },
+            onCopy = {
+                clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(uiState.codePhrase))
+                android.widget.Toast.makeText(context, context.getString(R.string.receive_code_copied), android.widget.Toast.LENGTH_SHORT).show()
+            },
+            onClose = { showQr = false; viewModel.stopWaitingForQr() }
+        )
+    }
     val showTransferSection = isTransferActive || isTransferFinished || isLegacyFallback
     val canReceive = uiState.codePhrase.isNotBlank()
     val fabLabel = when (uiState.transferState) {
@@ -176,38 +204,13 @@ fun ReceiveScreen(
         animationSpec = tween(400),
         label = "codeBorderProgress"
     )
-    val showCodeBorder = isTransferActive || uiState.transferState is CrocTransferState.Completed
+    val showCodeBorder = false // progress now lives in the Stage card
     val borderColor = MaterialTheme.colorScheme.tertiary
 
     Scaffold(
         containerColor = Color.Transparent,
         topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        com.dking.crocapp.ui.components.LogoMark(modifier = Modifier.padding(end = 10.dp).size(28.dp))
-                        Text(
-                            stringResource(R.string.nav_receive),
-                            fontWeight = FontWeight.Bold
-                        )
-                        com.dking.crocapp.ui.components.ModeDot(modifier = Modifier.padding(start = 4.dp))
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onNavigateToHistory) {
-                        Icon(Icons.Outlined.History, contentDescription = stringResource(R.string.nav_history))
-                    }
-                    IconButton(onClick = onNavigateToSettings) {
-                        Icon(Icons.Outlined.Settings, contentDescription = stringResource(R.string.nav_settings))
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent,
-                    scrolledContainerColor = Color.Transparent
-                ),
-                // The app's outer Scaffold already pads for the status bar.
-                windowInsets = androidx.compose.foundation.layout.WindowInsets(0, 0, 0, 0)
-            )
+            com.dking.crocapp.ui.components.AppTopBar(onHistory = onNavigateToHistory, onSettings = onNavigateToSettings)
         },
         bottomBar = {
             // ③ Full-width main action (same behaviour as the old floating button:
@@ -248,6 +251,13 @@ fun ReceiveScreen(
         ) {
             Spacer(modifier = Modifier.height(2.dp))
 
+            // ──── Card 1: code and where files go ────
+            GlassCard(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                shape = MaterialTheme.shapes.extraLarge
+            ) {
+            androidx.compose.runtime.CompositionLocalProvider(com.dking.crocapp.ui.components.LocalFlatCards provides true) {
             // ──── Code Entry Card — with animated progress border ────
             GlassCard(
                 modifier = Modifier
@@ -288,6 +298,7 @@ fun ReceiveScreen(
                             )
                         }
                         EngineBadge(engine = uiState.activeEngine)
+                        HelpDot(open = showQrHelp, onToggle = { showQrHelp = !showQrHelp })
                         Box {
                             IconButton(onClick = { showCodeMenu = true }, modifier = Modifier.size(32.dp)) {
                                 Icon(Icons.Rounded.MoreVert, contentDescription = stringResource(R.string.action_more_options))
@@ -334,23 +345,36 @@ fun ReceiveScreen(
                         }
                     }
 
-                    // The easy way first: scan the sender's QR.
-                    FilledTonalButton(
-                        onClick = onOpenScanner,
-                        enabled = !isTransferActive,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(52.dp),
-                        shape = MaterialTheme.shapes.large,
-                        colors = androidx.compose.material3.ButtonDefaults.filledTonalButtonColors(
-                            containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.10f),
-                            contentColor = MaterialTheme.colorScheme.secondary
-                        ),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.secondary.copy(alpha = 0.35f))
+                    // Two ways to use a QR: show ours (the sender scans it) or scan the sender's.
+                    androidx.compose.foundation.layout.Row(
+                        modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
+                        horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally)
                     ) {
-                        Icon(Icons.Rounded.QrCodeScanner, contentDescription = null, modifier = Modifier.size(20.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(stringResource(R.string.receive_scan_sender_qr), fontWeight = FontWeight.SemiBold)
+                        QrRoundButton(
+                            icon = Icons.Rounded.QrCode,
+                            label = stringResource(R.string.receive_show_qr),
+                            enabled = !isTransferActive || isWaitingForQr,
+                            onClick = {
+                                if (!isWaitingForQr) viewModel.showQrAndWait()
+                                showQr = true
+                            }
+                        )
+                        QrRoundButton(
+                            icon = Icons.Rounded.QrCodeScanner,
+                            label = stringResource(R.string.receive_scan_sender_qr),
+                            enabled = !isTransferActive,
+                            onClick = onOpenScanner
+                        )
+                    }
+                    androidx.compose.animation.AnimatedVisibility(
+                        visible = showQrHelp,
+                        enter = androidx.compose.animation.expandVertically() + fadeIn(),
+                        exit = androidx.compose.animation.shrinkVertically() + fadeOut()
+                    ) {
+                        Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                            QrHint(Icons.Rounded.QrCode, stringResource(R.string.receive_show_qr), stringResource(R.string.receive_hint_show))
+                            QrHint(Icons.Rounded.QrCodeScanner, stringResource(R.string.receive_scan_sender_qr), stringResource(R.string.receive_hint_scan))
+                        }
                     }
                     Text(
                         text = stringResource(R.string.receive_or_type),
@@ -434,6 +458,10 @@ fun ReceiveScreen(
                 }
             }
 
+            androidx.compose.material3.HorizontalDivider(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+            )
             // ──── ② Where files are saved ────
             GlassCard(
                 modifier = Modifier.fillMaxWidth(),
@@ -510,6 +538,8 @@ fun ReceiveScreen(
 
                 }
             }
+            } // CompositionLocalProvider
+            } // Card 1
 
             // Friendly hint while nothing is happening yet
             if (uiState.transferState is CrocTransferState.Idle && uiState.receivedFiles.isEmpty()) {
@@ -528,7 +558,7 @@ fun ReceiveScreen(
                 }
             }
 
-            // ──── Transfer Progress — between code and received files ────
+            // ──── Card 2: the Stage (progress, result, suit) ────
             AnimatedVisibility(
                 visible = showTransferSection,
                 enter = fadeIn() + slideInVertically { it / 2 },
@@ -606,6 +636,23 @@ fun ReceiveScreen(
                                         else "+$remaining more file${if (remaining > 1) "s" else ""}"
                                     )
                                 }
+                            )
+                        }
+
+                        // Share all · open the Downloads folder
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(28.dp, Alignment.CenterHorizontally)
+                        ) {
+                            RoundAction(
+                                icon = Icons.Rounded.Share,
+                                label = stringResource(R.string.action_share_all),
+                                onClick = { shareAllReceivedFiles(context, uiState.receivedFiles) }
+                            )
+                            RoundAction(
+                                icon = Icons.Rounded.FolderOpen,
+                                label = stringResource(R.string.action_open_folder),
+                                onClick = { openDownloadsFolder(context) }
                             )
                         }
                     }
@@ -743,18 +790,18 @@ internal fun ReceivedFileRow(
                 overflow = TextOverflow.Ellipsis
             )
         }
-        IconButton(onClick = onOpen, modifier = Modifier.size(32.dp)) {
+        IconButton(onClick = onOpen, modifier = Modifier.size(44.dp)) {
             Icon(
-                Icons.Rounded.FolderOpen,
-                contentDescription = "Open",
+                Icons.AutoMirrored.Rounded.OpenInNew,
+                contentDescription = stringResource(R.string.action_open_file),
                 modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-        IconButton(onClick = onShare, modifier = Modifier.size(32.dp)) {
+        IconButton(onClick = onShare, modifier = Modifier.size(44.dp)) {
             Icon(
                 Icons.Rounded.Share,
-                contentDescription = "Share",
+                contentDescription = stringResource(R.string.action_share_file),
                 modifier = Modifier.size(18.dp),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -826,5 +873,194 @@ private fun SavedCodeChipWithActions(
                 }
             )
         }
+    }
+}
+
+
+/** Round glass action with a small caption underneath (completed-transfer actions). */
+@Composable
+private fun RoundAction(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit
+) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        com.dking.crocapp.ui.components.GlassRoundButton(icon = icon, label = label, onClick = onClick, size = 52.dp)
+        Text(label, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+
+@Composable
+private fun QrRoundButton(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
+    val gold = MaterialTheme.colorScheme.secondary
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        androidx.compose.material3.Surface(
+            onClick = onClick,
+            enabled = enabled,
+            shape = androidx.compose.foundation.shape.CircleShape,
+            color = gold.copy(alpha = if (enabled) 0.14f else 0.06f),
+            contentColor = if (enabled) gold else gold.copy(alpha = 0.4f),
+            border = androidx.compose.foundation.BorderStroke(1.dp, gold.copy(alpha = if (enabled) 0.32f else 0.12f)),
+            modifier = Modifier.size(58.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
+            }
+        }
+        Text(
+            label,
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = if (enabled) 1f else 0.5f)
+        )
+    }
+}
+
+@Composable
+private fun HelpDot(open: Boolean, onToggle: () -> Unit) {
+    val turn by androidx.compose.animation.core.animateFloatAsState(if (open) 360f else 0f, label = "helpTurn")
+    val cs = MaterialTheme.colorScheme
+    val desc = stringResource(if (open) R.string.receive_qr_help_hide else R.string.receive_qr_help_show)
+    androidx.compose.material3.Surface(
+        onClick = onToggle,
+        shape = androidx.compose.foundation.shape.CircleShape,
+        color = if (open) cs.inverseSurface else androidx.compose.ui.graphics.Color.Transparent,
+        contentColor = if (open) cs.inverseOnSurface else cs.onSurfaceVariant,
+        border = androidx.compose.foundation.BorderStroke(1.dp, cs.outlineVariant),
+        modifier = Modifier.size(30.dp).semantics { contentDescription = desc }
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            Icon(
+                Icons.Outlined.Info, contentDescription = null,
+                modifier = Modifier.size(17.dp).graphicsLayer { rotationZ = turn }
+            )
+        }
+    }
+}
+
+@Composable
+private fun QrHint(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, body: String) {
+    val cs = MaterialTheme.colorScheme
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(14.dp))
+            .background(cs.surfaceContainerHighest.copy(alpha = 0.6f))
+            .padding(horizontal = 12.dp, vertical = 9.dp),
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Icon(icon, contentDescription = null, tint = cs.secondary, modifier = Modifier.size(16.dp).padding(top = 1.dp))
+        Text(
+            androidx.compose.ui.text.buildAnnotatedString {
+                pushStyle(androidx.compose.ui.text.SpanStyle(fontWeight = FontWeight.SemiBold, color = cs.onSurface))
+                append(title)
+                pop()
+                append(" — ")
+                append(body)
+            },
+            style = MaterialTheme.typography.bodySmall,
+            color = cs.onSurfaceVariant
+        )
+    }
+}
+
+/** Phone "Show QR": the code as a big QR; closes itself when the sender connects. */
+@Composable
+private fun ShowQrDialog(code: String, onNewCode: () -> Unit, onCopy: () -> Unit, onClose: () -> Unit) {
+    androidx.compose.ui.window.Dialog(
+        onDismissRequest = onClose,
+        properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
+    ) {
+        androidx.compose.material3.Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
+            androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
+                val qr = minOf(maxWidth - 96.dp, maxHeight * 0.42f, 320.dp)
+                Column(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp, vertical = 20.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            stringResource(R.string.receive_qr_title),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.weight(1f)
+                        )
+                        com.dking.crocapp.ui.components.GlassRoundButton(
+                            icon = Icons.Rounded.Close,
+                            label = stringResource(R.string.action_close),
+                            onClick = onClose
+                        )
+                    }
+                    Spacer(Modifier.weight(1f))
+                    com.dking.crocapp.ui.components.QrCodeImage(
+                        data = com.dking.crocapp.util.QrCodeParser.sendDeepLink(code, once = true),
+                        size = qr, padding = 16.dp, expandable = false, showExpandHint = false
+                    )
+                    Spacer(Modifier.height(20.dp))
+                    Text(
+                        code,
+                        fontFamily = com.dking.crocapp.ui.theme.MonoFamily,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.secondary,
+                        maxLines = 1,
+                        softWrap = false
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    WaitingDot()
+                    Spacer(Modifier.height(20.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(28.dp)) {
+                        LabeledRound(Icons.Rounded.Refresh, stringResource(R.string.panel_new_code_now), onNewCode)
+                        LabeledRound(Icons.Rounded.ContentCopy, stringResource(R.string.action_copy), onCopy)
+                    }
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        stringResource(R.string.receive_qr_steps),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(14.dp))
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                            .padding(12.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun WaitingDot() {
+    val t = androidx.compose.animation.core.rememberInfiniteTransition(label = "wait")
+    val a by t.animateFloat(
+        1f, 0.3f,
+        androidx.compose.animation.core.infiniteRepeatable(androidx.compose.animation.core.tween(700), androidx.compose.animation.core.RepeatMode.Reverse),
+        label = "waitDot"
+    )
+    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Box(
+            Modifier.size(9.dp).graphicsLayer { alpha = a }
+                .clip(androidx.compose.foundation.shape.CircleShape)
+                .background(androidx.compose.ui.graphics.Color(0xFF30C26B))
+        )
+        Text(stringResource(R.string.receive_qr_waiting), style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun LabeledRound(icon: androidx.compose.ui.graphics.vector.ImageVector, label: String, onClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(6.dp)) {
+        com.dking.crocapp.ui.components.GlassRoundButton(icon = icon, label = label, onClick = onClick, size = 48.dp)
+        Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }

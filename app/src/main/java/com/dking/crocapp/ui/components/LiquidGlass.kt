@@ -9,6 +9,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
@@ -131,6 +132,9 @@ fun Modifier.liquidGlass(
  * `GlassCard(` is the whole migration. The card's containerColor becomes the
  * glass tint; its contentColor is kept so text colours don't change.
  */
+/** When true, [GlassCard] renders as a plain section (used inside the two-card layout). */
+val LocalFlatCards = androidx.compose.runtime.staticCompositionLocalOf { false }
+
 @Composable
 fun GlassCard(
     modifier: Modifier = Modifier,
@@ -138,6 +142,11 @@ fun GlassCard(
     colors: CardColors = CardDefaults.cardColors(),
     content: @Composable ColumnScope.() -> Unit
 ) {
+    // Inside a grouping card (two-card layout) sections draw flat: no nested card.
+    if (LocalFlatCards.current) {
+        androidx.compose.foundation.layout.Column(modifier = modifier.fillMaxWidth(), content = content)
+        return
+    }
     // Blurred shadows are re-rendered whenever a card changes size (e.g. the
     // Send screen's mode panel morphs height on every frame of a switch).
     // Phones handle that easily. Large displays — classroom smart panels,
@@ -175,7 +184,14 @@ fun LiquidBackdrop(modifier: Modifier = Modifier) {
     val dark = cs.surface.luminance() < 0.5f
     val amoled = cs.background == Color.Black
     // One faint warm glow at the top of the screen; everything else stays near-black.
-    val glow = if (dark) Color(0xFF2B1311).copy(alpha = if (amoled) 0.7f else 1f) else cs.primaryContainer.copy(alpha = 0.35f)
+    val monet = com.dking.crocapp.ui.theme.LocalMonet.current
+    // Monet: a faint wash of the wallpaper's accent at the top; the background itself stays neutral.
+    val glow = when {
+        monet && dark -> cs.primary.copy(alpha = if (amoled) 0.10f else 0.14f)
+        monet -> cs.primaryContainer.copy(alpha = 0.40f)
+        dark -> Color(0xFF2B1311).copy(alpha = if (amoled) 0.7f else 1f)
+        else -> com.dking.crocapp.ui.theme.md_theme_light_primaryContainer.copy(alpha = 0.35f)
+    }
     val bg = cs.background
 
     Box(

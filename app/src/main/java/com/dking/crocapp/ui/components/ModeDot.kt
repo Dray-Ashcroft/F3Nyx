@@ -39,12 +39,26 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.History
+import androidx.compose.ui.semantics.selected
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.material.icons.rounded.Tv
+import androidx.compose.material.icons.rounded.Smartphone
+import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -72,73 +86,154 @@ private val MekoDeep = Color(0xFF0369A1)
 val RimasViolet = Color(0xFFF59E0B)
 private val RimasDeep = Color(0xFFB45309)
 
+
+
+
+
 /**
- * The small mode dot shown beside each main screen's title.
- *
- * Hold it (~1 s, the system long-press) to switch Meko ⇄ Rimas; a short
- * callout says who was summoned. A single tap does nothing on purpose, so a
- * student brushing the smart panel can't switch it by accident.
- *
- * It reads and writes the saved mode directly; the app reacts to the change
- * (Rimas hides the bottom bar and goes to the QR screen).
+ * App top bar without words: logo on the left, the phone | panel switch centred on the
+ * screen (not in the leftover space), History and Settings on the right. One centre line,
+ * 56 dp tall, same edge margin as the cards below.
  */
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ModeDot(modifier: Modifier = Modifier) {
+fun AppTopBar(
+    onHistory: () -> Unit,
+    onSettings: () -> Unit,
+    modifier: Modifier = Modifier,
+    margin: androidx.compose.ui.unit.Dp = 16.dp
+) {
     val context = LocalContext.current.applicationContext
     val repo = remember { UserPreferencesRepository(context) }
     val panelModeFlow = remember { repo.preferencesFlow.map { it.panelMode } }
     val panelMode by panelModeFlow.collectAsStateWithLifecycle(initialValue = null)
     val scope = rememberCoroutineScope()
     val haptics = LocalHapticFeedback.current
-
-    val isRimas = panelMode ?: return // not loaded yet: draw nothing
-    val color = if (isRimas) RimasViolet else MekoGreen
-    val name = stringResource(if (isRimas) R.string.mode_rimas else R.string.mode_meko)
-    val a11y = stringResource(R.string.mode_dot_a11y, name)
-
-    // Remember the last summoned mode so the label keeps its colour while fading out.
-    var lastRimas by remember { mutableStateOf(false) }
-    ModeCallout.summoned?.let { lastRimas = it }
-    val labelColor = if (lastRimas) RimasViolet else MekoGreen
-
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
-        // Mode light: cyan ring = Jarvis (phone), amber ring = Friday (panel). Hold to switch.
-        Box(
-            modifier = Modifier
-                .size(40.dp) // touch target around the small light
-                .clip(CircleShape)
-                .combinedClickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = { /* intentionally nothing */ },
-                    onLongClick = {
-                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                        val next = !isRimas
-                        scope.launch { repo.updatePanelMode(next) }
-                        ModeCallout.show(next)
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .padding(horizontal = margin)
+    ) {
+        LogoMark(modifier = Modifier.align(Alignment.CenterStart).size(30.dp))
+        panelMode?.let { isPanel ->
+            LayoutSwitch(
+                panel = isPanel,
+                onSelect = { toPanel ->
+                    if (toPanel != isPanel) {
+                        haptics.performHapticFeedback(HapticFeedbackType.TextHandleMove)
+                        scope.launch { repo.updatePanelMode(toPanel) }
+                        ModeCallout.show(toPanel)
                     }
-                )
-                .semantics { contentDescription = a11y },
-            contentAlignment = Alignment.Center
-        ) {
-            ModeLight(color = color)
+                },
+                modifier = Modifier.align(Alignment.Center)
+            )
         }
+        Row(modifier = Modifier.align(Alignment.CenterEnd).offset(x = 10.dp)) {
+            androidx.compose.material3.IconButton(onClick = onHistory) {
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.Outlined.History,
+                    contentDescription = stringResource(R.string.nav_history)
+                )
+            }
+            androidx.compose.material3.IconButton(onClick = onSettings) {
+                androidx.compose.material3.Icon(
+                    androidx.compose.material.icons.Icons.Outlined.Settings,
+                    contentDescription = stringResource(R.string.nav_settings)
+                )
+            }
+        }
+    }
+}
 
-        // Quiet inline callout: slides out beside the dot, then fades away.
-        AnimatedVisibility(
-            visible = false, // name now shown by the full-screen switch overlay
-            enter = fadeIn() + expandHorizontally(expandFrom = Alignment.Start),
-            exit = fadeOut() + shrinkHorizontally(shrinkTowards = Alignment.Start)
+/** Two round segments: phone | panel. The selected one is filled. */
+@Composable
+fun LayoutSwitch(panel: Boolean, onSelect: (Boolean) -> Unit, modifier: Modifier = Modifier) {
+    val cs = MaterialTheme.colorScheme
+    val density = androidx.compose.ui.platform.LocalDensity.current
+    val drop = rememberDroplet()
+    val scope = androidx.compose.runtime.rememberCoroutineScope()
+    // Show the new side at once; the layout change follows after the ripple has started,
+    // because switching layout swaps the screen (and this switch with it).
+    var shown by androidx.compose.runtime.remember(panel) { androidx.compose.runtime.mutableStateOf(panel) }
+    fun tap(toPanel: Boolean) {
+        if (toPanel == shown) return
+        val i = if (toPanel) 1 else 0
+        with(density) {
+            drop.drop(Offset((3 + i * 46 + 22).dp.toPx(), (3 + 18).dp.toPx()), i)
+        }
+        shown = toPanel
+        scope.launch {
+            kotlinx.coroutines.delay(260)
+            onSelect(toPanel)
+        }
+    }
+    androidx.compose.material3.Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(22.dp),
+        color = cs.surfaceContainerHighest.copy(alpha = 0.7f),
+        border = androidx.compose.foundation.BorderStroke(1.dp, cs.outlineVariant.copy(alpha = 0.6f))
+    ) {
+        Row(
+            modifier = Modifier
+                .dropletRings(drop, cs.onSurfaceVariant, with(density) { 40.dp.toPx() })
+                .padding(3.dp),
+            horizontalArrangement = Arrangement.spacedBy(2.dp)
         ) {
-            Text(
-                text = stringResource(
-                    if (lastRimas) R.string.mode_summoned_rimas else R.string.mode_summoned_meko
-                ),
-                color = labelColor,
-                style = MaterialTheme.typography.labelLarge,
-                fontWeight = FontWeight.Medium,
-                maxLines = 1
+            SwitchSegment(
+                icon = androidx.compose.material.icons.Icons.Rounded.Smartphone,
+                label = stringResource(R.string.layout_phone),
+                selected = !shown,
+                modifier = Modifier.dropletSquash(drop, 0),
+                onClick = { tap(false) }
+            )
+            SwitchSegment(
+                icon = androidx.compose.material.icons.Icons.Rounded.Tv,
+                label = stringResource(R.string.layout_panel),
+                selected = shown,
+                modifier = Modifier.dropletSquash(drop, 1),
+                onClick = { tap(true) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun SwitchSegment(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    selected: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    val cs = MaterialTheme.colorScheme
+    val monet = com.dking.crocapp.ui.theme.LocalMonet.current
+    val bg by androidx.compose.animation.animateColorAsState(
+        if (!selected) Color.Transparent else if (monet) cs.primary else cs.inverseSurface,
+        androidx.compose.animation.core.tween(220), label = "segBg"
+    )
+    val fg by androidx.compose.animation.animateColorAsState(
+        if (!selected) cs.onSurfaceVariant else if (monet) cs.onPrimary else cs.inverseOnSurface,
+        androidx.compose.animation.core.tween(220), label = "segFg"
+    )
+    val scale by androidx.compose.animation.core.animateFloatAsState(
+        if (selected) 1.12f else 1f,
+        androidx.compose.animation.core.spring(dampingRatio = 0.5f, stiffness = androidx.compose.animation.core.Spring.StiffnessMedium),
+        label = "segIcon"
+    )
+    androidx.compose.material3.Surface(
+        onClick = onClick,
+        modifier = modifier.size(width = 44.dp, height = 36.dp).semantics {
+            contentDescription = label
+            this.selected = selected
+        },
+        shape = RoundedCornerShape(18.dp),
+        color = bg,
+        contentColor = fg
+    ) {
+        Box(contentAlignment = Alignment.Center) {
+            androidx.compose.material3.Icon(
+                icon, contentDescription = null,
+                modifier = Modifier.size(18.dp).graphicsLayer { scaleX = scale; scaleY = scale }
             )
         }
     }
@@ -177,40 +272,7 @@ fun ModeCalloutHost() {
     LaunchedEffect(key) { }
 }
 
-/**
- * Mode mark: a small HUD ring with two rotating arc segments and a core.
- * Animation runs in the draw phase only (no recomposition).
- *  - Jarvis (phone): arcs turn slowly all the time.
- *  - Friday (panel): still, to spare weak panel GPUs; spins up only when summoned.
- */
-@Composable
-fun HudMark(rimas: Boolean, modifier: Modifier = Modifier) {
-    val spin = remember { Animatable(0f) }
-    val glow = remember { Animatable(0.4f) }
 
-    LaunchedEffect(rimas, ModeCallout.key) {
-        launch {
-            glow.animateTo(1f, tween(250))
-            glow.animateTo(0.4f, tween(900))
-        }
-        // Summon: one fast turn.
-        spin.animateTo(spin.value + 360f, tween(900, easing = FastOutSlowInEasing))
-        spin.snapTo(spin.value % 360f)
-        if (!rimas && UiEffects.full) {
-            while (true) {
-                spin.animateTo(spin.value + 360f, tween(6_000, easing = LinearEasing))
-                spin.snapTo(spin.value % 360f)
-            }
-        }
-    }
-
-    val light = if (rimas) RimasViolet else MekoGreen
-    val deep = if (rimas) RimasDeep else MekoDeep
-
-    Canvas(modifier = modifier) {
-        drawHud(light, deep, spin.value, glow.value)
-    }
-}
 
 private fun DrawScope.drawHud(light: Color, deep: Color, angle: Float, glowAlpha: Float) {
     val r = size.minDimension / 2f
@@ -243,7 +305,7 @@ private fun DrawScope.drawHud(light: Color, deep: Color, angle: Float, glowAlpha
 }
 
 /**
- * FeNyx mark: two arrows (red, gold) chasing each other around a small core.
+ * F3Nyx mark: two arrows (red, gold) chasing each other around a small core.
  * Each arrow is an arc with a rounded tail and a filled head aligned to the arc's
  * tangent, so both ends are clean at any size or rotation.
  */
@@ -254,8 +316,15 @@ fun LogoMark(
     rotation: Float = 0f,
     coreAlpha: Float = 1f
 ) {
+    // Light mode: the original mark sits on a small dark badge so it reads on white.
+    val light = androidx.compose.material3.MaterialTheme.colorScheme.surface.luminance() > 0.5f
+    val red = Color(0xFFC42B22)
+    val gold = Color(0xFFD4A017)
+    val coreC = core
+    val centre = Color.White
     Canvas(modifier = modifier) {
         val u = size.minDimension / 32f
+        if (light) drawCircle(Color(0xFF1B1B1F), radius = 16f * u)
         val c = Offset(size.width / 2f, size.height / 2f)
         val r = 10.5f * u
         val stroke = 2.6f * u
@@ -287,37 +356,26 @@ fun LogoMark(
         }
 
         rotate(rotation, pivot = c) {
-            arrow(Color(0xFFC42B22), startDeg = 196f, sweepDeg = 122f)  // red: left, over the top
-            arrow(Color(0xFFD4A017), startDeg = 16f, sweepDeg = 122f)   // gold: right, under the bottom
+            arrow(red, startDeg = 196f, sweepDeg = 122f)  // red: left, over the top
+            arrow(gold, startDeg = 16f, sweepDeg = 122f)   // gold: right, under the bottom
         }
         // Thin gold bracket ring around the core (matches the app icon).
         val br = 5.2f * u
         for (k in 0 until 4) {
             drawArc(
-                Color(0xFFD4A017).copy(alpha = 0.9f), startAngle = k * 90f + 57f, sweepAngle = 66f, useCenter = false,
+                gold.copy(alpha = 0.9f), startAngle = k * 90f + 57f, sweepAngle = 66f, useCenter = false,
                 topLeft = Offset(c.x - br, c.y - br), size = androidx.compose.ui.geometry.Size(br * 2, br * 2),
                 style = Stroke(width = 0.9f * u, cap = androidx.compose.ui.graphics.StrokeCap.Round)
             )
         }
         // Core stays upright and blinks on its own.
-        drawCircle(core.copy(alpha = 0.30f * coreAlpha), radius = 4.0f * u, center = c)
-        drawCircle(Color.White.copy(alpha = coreAlpha), radius = 1.6f * u, center = c)
-        drawCircle(core.copy(alpha = 0.85f * coreAlpha), radius = 2.6f * u, center = c, style = Stroke(width = 1.1f * u))
+        drawCircle(coreC.copy(alpha = 0.30f * coreAlpha), radius = 4.0f * u, center = c)
+        drawCircle(centre.copy(alpha = coreAlpha), radius = 1.6f * u, center = c)
+        drawCircle(coreC.copy(alpha = 0.85f * coreAlpha), radius = 2.6f * u, center = c, style = Stroke(width = 1.1f * u))
     }
 }
 
-/** Header mark: slow turning arrows, faint blinking core in the mode colour. Still when Full effects is off. */
-@Composable
-fun ModeLogo(core: Color, modifier: Modifier = Modifier) {
-    if (!UiEffects.full) {
-        LogoMark(modifier = modifier, core = core)
-        return
-    }
-    val t = rememberInfiniteTransition(label = "logo")
-    val rot by t.animateFloat(0f, 360f, infiniteRepeatable(tween(if (TransferActivity.active) 4_000 else 12_000, easing = LinearEasing)), label = "rot")
-    val blink by t.animateFloat(0.45f, 1f, infiniteRepeatable(tween(1_400), RepeatMode.Reverse), label = "blink")
-    LogoMark(modifier = modifier, core = core, rotation = rot, coreAlpha = blink)
-}
+
 
 /** Small glowing ring in the mode colour; breathes softly when Full effects is on. */
 @Composable
@@ -327,12 +385,20 @@ fun ModeLight(color: Color, modifier: Modifier = Modifier) {
             0.55f, 1f, infiniteRepeatable(tween(1_600), RepeatMode.Reverse), label = "glow"
         ).value
     } else 0.8f
+    // Light mode: deeper shade and a slightly thicker ring so it reads on white.
+    val light = androidx.compose.material3.MaterialTheme.colorScheme.surface.luminance() > 0.5f
+    val ring = when {
+        !light -> color
+        color == MekoGreen -> Color(0xFF0284C7)     // Jarvis: deep sky blue
+        color == RimasViolet -> Color(0xFFD97706)   // Friday: deep amber
+        else -> androidx.compose.ui.graphics.lerp(color, Color.Black, 0.25f)
+    }
     Canvas(modifier = modifier.size(26.dp)) {
         val r = 6.dp.toPx()
         drawCircle(
-            Brush.radialGradient(listOf(color.copy(alpha = 0.45f * glow), Color.Transparent), center = center, radius = r * 2.1f),
+            Brush.radialGradient(listOf(ring.copy(alpha = (if (light) 0.30f else 0.45f) * glow), Color.Transparent), center = center, radius = r * 2.1f),
             radius = r * 2.1f
         )
-        drawCircle(color, radius = r, style = Stroke(width = 2.dp.toPx()))
+        drawCircle(ring, radius = r, style = Stroke(width = (if (light) 2.6f else 2f).dp.toPx()))
     }
 }

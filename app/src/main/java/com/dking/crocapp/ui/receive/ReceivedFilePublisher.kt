@@ -75,9 +75,9 @@ internal object ReceivedFilePublisher {
         val resolver = application.contentResolver
         val treeDoc = DocumentFile.fromTreeUri(application, treeUri) ?: return null
 
-        // Create FeNyx subdirectory inside the user-picked tree
-        var targetDir = treeDoc.findFile("FeNyx")
-            ?: treeDoc.createDirectory("FeNyx")
+        // Create F3Nyx subdirectory inside the user-picked tree
+        var targetDir = treeDoc.findFile("F3Nyx")
+            ?: treeDoc.createDirectory("F3Nyx")
             ?: return null
 
         // If the file came from a folder transfer, recreate the subdirectory structure
@@ -112,7 +112,7 @@ internal object ReceivedFilePublisher {
             val actualName = destDoc.name ?: source.name
             val displayPath = buildString {
                 treeDoc.name?.let { append("$it/") }
-                append("FeNyx/")
+                append("F3Nyx/")
                 if (subdir.isNotEmpty()) append("$subdir/")
                 append(actualName)
             }
@@ -139,12 +139,12 @@ internal object ReceivedFilePublisher {
         conflictStrategy: String
     ): ReceivedFile? {
         val resolver = application.contentResolver
-        // For folder transfers, preserve subdirectory structure under FeNyx
+        // For folder transfers, preserve subdirectory structure under F3Nyx
         val subdir = relativeSubdir(relativePath)
         val mediaRelativePath = if (subdir.isNotEmpty()) {
-            "${Environment.DIRECTORY_DOWNLOADS}/FeNyx/$subdir"
+            "${Environment.DIRECTORY_DOWNLOADS}/F3Nyx/$subdir"
         } else {
-            "${Environment.DIRECTORY_DOWNLOADS}/FeNyx"
+            "${Environment.DIRECTORY_DOWNLOADS}/F3Nyx"
         }
         val formattedPath = if (mediaRelativePath.endsWith("/")) mediaRelativePath else "$mediaRelativePath/"
         val mimeType = URLConnection.guessContentTypeFromName(source.name) ?: "application/octet-stream"
@@ -166,9 +166,9 @@ internal object ReceivedFilePublisher {
 
                 if (overwritten) {
                     val displayLocation = if (subdir.isNotEmpty()) {
-                        "Downloads/FeNyx/$subdir/${source.name}"
+                        "Downloads/F3Nyx/$subdir/${source.name}"
                     } else {
-                        "Downloads/FeNyx/${source.name}"
+                        "Downloads/F3Nyx/${source.name}"
                     }
                     return ReceivedFile(
                         name = if (subdir.isNotEmpty()) "$subdir/${source.name}" else source.name,
@@ -182,7 +182,7 @@ internal object ReceivedFilePublisher {
             // Fallback for overwrite: ensure any existing physical file or MediaStore record is removed so (1) is not appended
             try {
                 val publicDownloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-                val targetPhysicalFile = File(publicDownloads, if (subdir.isNotEmpty()) "FeNyx/$subdir/${source.name}" else "FeNyx/${source.name}")
+                val targetPhysicalFile = File(publicDownloads, if (subdir.isNotEmpty()) "F3Nyx/$subdir/${source.name}" else "F3Nyx/${source.name}")
                 if (targetPhysicalFile.exists()) {
                     targetPhysicalFile.delete()
                 }
@@ -197,7 +197,7 @@ internal object ReceivedFilePublisher {
                 resolver.delete(
                     collection,
                     "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ? COLLATE NOCASE AND ${MediaStore.Files.FileColumns.RELATIVE_PATH} LIKE ?",
-                    arrayOf(source.name, "%FeNyx%")
+                    arrayOf(source.name, "%F3Nyx%")
                 )
             } catch (_: Exception) {}
         }
@@ -227,9 +227,9 @@ internal object ReceivedFilePublisher {
 
             val actualDisplayName = getDisplayNameFromUri(resolver, insertUri) ?: source.name
             val displayLocation = if (subdir.isNotEmpty()) {
-                "Downloads/FeNyx/$subdir/$actualDisplayName"
+                "Downloads/F3Nyx/$subdir/$actualDisplayName"
             } else {
-                "Downloads/FeNyx/$actualDisplayName"
+                "Downloads/F3Nyx/$actualDisplayName"
             }
 
             ReceivedFile(
@@ -264,7 +264,7 @@ internal object ReceivedFilePublisher {
 
         val selection = "${MediaStore.Files.FileColumns.DISPLAY_NAME} = ? COLLATE NOCASE AND (${MediaStore.Files.FileColumns.RELATIVE_PATH} LIKE ? OR ${MediaStore.Files.FileColumns.RELATIVE_PATH} LIKE ?)"
         val pathPattern1 = "%${mediaRelativePath.trim('/')}%"
-        val pathPattern2 = "%FeNyx%"
+        val pathPattern2 = "%F3Nyx%"
         val selectionArgs = arrayOf(displayName, pathPattern1, pathPattern2)
 
         return try {
@@ -307,9 +307,9 @@ internal object ReceivedFilePublisher {
         // For folder transfers, preserve subdirectory structure
         val subdir = relativeSubdir(relativePath)
         val targetDir = if (subdir.isNotEmpty()) {
-            File(downloadsDir, "FeNyx/$subdir").apply { mkdirs() }
+            File(downloadsDir, "F3Nyx/$subdir").apply { mkdirs() }
         } else {
-            File(downloadsDir, "FeNyx").apply { mkdirs() }
+            File(downloadsDir, "F3Nyx").apply { mkdirs() }
         }
         val targetFile = if (conflictStrategy == "overwrite") {
             File(targetDir, source.name)

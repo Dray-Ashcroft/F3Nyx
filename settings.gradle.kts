@@ -18,5 +18,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "FeNyx"
+rootProject.name = "F3Nyx"
 include(":app")

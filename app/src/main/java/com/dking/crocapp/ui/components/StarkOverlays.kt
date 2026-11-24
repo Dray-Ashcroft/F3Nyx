@@ -65,7 +65,7 @@ fun timeGreeting(hour: Int = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)): 
 @Composable
 fun StarkOverlays() {
     // No boot screen in the minimal design: the app opens straight to work.
-    SuitOverlay()
+    /* suit now plays inside the Stage card */
     ModeSwitchOverlay()
 }
 
@@ -89,6 +89,8 @@ fun ModeSwitchOverlay() {
     var long by remember { mutableStateOf(false) }
     LaunchedEffect(ModeCallout.key) {
         if (ModeCallout.key == 0) return@LaunchedEffect
+        // No intro when motion is off (animations off, battery saver, Full effects off).
+        if (!UiEffects.motionAllowed(context)) { ModeCallout.hide(); return@LaunchedEffect }
         // ~2 s the first time each mode appears; ~0.8 s after that.
         long = UiEffects.consumeFirstIntro(context, ModeCallout.summoned == true)
         val duration = if (long) 2_000 else 800
@@ -168,7 +170,7 @@ fun ModeSwitchOverlay() {
                         translationY = (1f - text.value) * 8.dp.toPx()
                     }
                 ) {
-                    Text(name, color = Color(0xFFF2F2F3), fontSize = 26.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 6.sp)
+                    Text(name, color = Color(0xFFF2F2F3), fontSize = 26.sp, fontFamily = com.dking.crocapp.ui.theme.InterFamily, fontWeight = FontWeight.SemiBold, letterSpacing = 6.sp)
                     Text(role, color = color, fontSize = 13.sp, fontFamily = com.dking.crocapp.ui.theme.MonoFamily, letterSpacing = 3.sp)
                 }
             }

@@ -29,6 +29,7 @@ object UiEffects {
     fun load(context: Context) {
         if (loaded) return
         full = prefs(context).getBoolean(KEY_FULL, true)
+        loadPanelAnimation(context)
         loaded = true
     }
 
@@ -49,11 +50,13 @@ object UiEffects {
     }
 
     /** Suit cue: full version the first finished transfer of the day, short after. */
-    fun consumeSuitFullForToday(context: Context): Boolean {
+    fun consumeSuitFullForToday(context: Context, launch: Boolean): Boolean {
         val today = SimpleDateFormat("yyyyMMdd", Locale.US).format(Date())
         val p = prefs(context)
-        if (p.getString("suit_day", null) == today) return false
-        p.edit().putString("suit_day", today).apply()
+        // Lift-off and landing each get their own full showing per day.
+        val key = if (launch) "suit_day" else "suit_day_land"
+        if (p.getString(key, null) == today) return false
+        p.edit().putString(key, today).apply()
         return true
     }
 
@@ -66,5 +69,34 @@ object UiEffects {
         if (p.getBoolean(key, false)) return false
         p.edit().putBoolean(key, true).apply()
         return true
+    }
+
+    /**
+     * Motion is allowed when Full effects is on, the phone's animations are not turned off
+     * (Settings > Accessibility / Developer options) and battery saver is off.
+     */
+    fun motionAllowed(context: android.content.Context): Boolean {
+        if (!full) return false
+        val scale = try {
+            android.provider.Settings.Global.getFloat(
+                context.contentResolver, android.provider.Settings.Global.ANIMATOR_DURATION_SCALE, 1f
+            )
+        } catch (_: Exception) { 1f }
+        if (scale == 0f) return false
+        val pm = context.getSystemService(android.content.Context.POWER_SERVICE) as? android.os.PowerManager
+        return pm?.isPowerSaveMode != true
+    }
+
+    /** Suit animation on the Friday panel: off by default (classroom), toggled from the panel. */
+    var panelAnimation by androidx.compose.runtime.mutableStateOf(false)
+        private set
+
+    fun setPanelAnimation(context: android.content.Context, on: Boolean) {
+        panelAnimation = on
+        context.getSharedPreferences("fenyx_ui", android.content.Context.MODE_PRIVATE).edit().putBoolean("panel_anim", on).apply()
+    }
+
+    fun loadPanelAnimation(context: android.content.Context) {
+        panelAnimation = context.getSharedPreferences("fenyx_ui", android.content.Context.MODE_PRIVATE).getBoolean("panel_anim", false)
     }
 }

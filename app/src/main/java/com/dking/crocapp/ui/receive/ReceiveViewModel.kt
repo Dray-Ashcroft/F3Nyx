@@ -44,11 +44,14 @@ data class ReceiveUiState(
     val savedCodePhrases: List<String> = emptyList(),
     val receivedFiles: List<ReceivedFile> = emptyList(),
     val sessionOverrideUri: Uri? = null,
-    val receiveLocationLabel: String = "Downloads/FeNyx",
+    val receiveLocationLabel: String = "Downloads/F3Nyx",
     // ── Panel mode ──
     val panelMode: Boolean = false,
     /** When the current panel code was issued (ms), for the "new code in N min" hint. */
-    val panelCodeIssuedAt: Long = 0L
+    val panelCodeIssuedAt: Long = 0L,
+    /** Panel: files and texts received this session, newest first. */
+    val sessionFiles: List<ReceivedFile> = emptyList(),
+    val sessionTexts: List<String> = emptyList()
 )
 
 /** How often a waiting panel swaps to a fresh code (and QR). */
@@ -61,6 +64,8 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
     private val binaryManager = CrocBinaryManager(application)
     private val crocProcess = CrocProcess(application, binaryManager, prefsRepo)
     private var currentOutputDir: File? = null
+    /** True while received files are being moved into Downloads; the panel waits for it. */
+    @Volatile private var publishing = false
 
     // The coroutine running the current croc receive, so it can be stopped
     // cleanly before a new one starts (panel code refresh).
@@ -77,13 +82,16 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
     val uiState: StateFlow<ReceiveUiState> = _uiState.asStateFlow()
 
     init {
+        com.dking.crocapp.service.TransferNotifier.onCancelReceive = { cancelTransfer() }
         viewModelScope.launch {
             crocProcess.state.collect { state ->
                 if (state::class != _uiState.value.transferState::class) {
                     stateSince = System.currentTimeMillis()
                 }
                 _uiState.update { it.copy(transferState = state) }
+                com.dking.crocapp.service.TransferNotifier.onState(getApplication(), state, sending = false)
                 if (state is CrocTransferState.Completed) {
+                    publishing = true
                     val prefs = prefsRepo.preferencesFlow.first()
                     // Session override takes priority, then settings, then default
                     val customUri = _uiState.value.sessionOverrideUri
@@ -96,7 +104,19 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
                     } catch (e: Exception) {
                         emptyList()
                     }
-                    _uiState.update { it.copy(receivedFiles = receivedFiles) }
+                    _uiState.update {
+                        it.copy(
+                            receivedFiles = receivedFiles,
+                            // Panel: keep everything received this session for the Files / Text tabs.
+                            sessionFiles = if (panelActive) (receivedFiles + it.sessionFiles).take(50) else it.sessionFiles,
+                            sessionTexts = if (panelActive && state.receivedText != null) (listOf(state.receivedText) + it.sessionTexts).take(50) else it.sessionTexts
+                        )
+                    }
+                    if (receivedFiles.isNotEmpty() && state.receivedText == null) {
+                        com.dking.crocapp.service.TransferNotifier.onReceivedFiles(
+                            getApplication(), receivedFiles.map { it.uri to it.mimeType }, state.totalBytes
+                        )
+                    }
                     // Use actual file names for history, not truncated parser names
                     val actualNames = receivedFiles.map { it.name }
                     saveToHistory(
@@ -112,6 +132,7 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
                         withContext(Dispatchers.IO) { dir?.deleteRecursively() }
                     }
                     currentOutputDir = null
+                    publishing = false
                 }
             }
         }
@@ -151,6 +172,32 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
             currentOutputDir = null
         }
         _uiState.update { it.copy(codePhrase = parsed) }
+    }
+
+    /**
+     * Show QR on a phone: make a fresh code and start waiting, the way a panel does.
+     * The sender scans the QR (or types the code) from Transmit.
+     */
+    fun showQrAndWait() {
+        if (crocProcess.state.value is CrocTransferState.Transferring) return
+        currentOutputDir?.deleteRecursively()
+        currentOutputDir = null
+        val code = CodePhraseGenerator.generate()
+        _uiState.update { it.copy(codePhrase = code, activeEngine = CrocEngine.CURRENT) }
+        startReceive(CrocEngine.CURRENT)
+    }
+
+    /** Closing the QR before anyone connected: stop waiting but keep the code. */
+    fun stopWaitingForQr() {
+        when (crocProcess.state.value) {
+            is CrocTransferState.Preparing, is CrocTransferState.WaitingForPeer -> {
+                receiveJob?.cancel()
+                crocProcess.reset()
+                currentOutputDir?.deleteRecursively()
+                currentOutputDir = null
+            }
+            else -> Unit
+        }
     }
 
     fun startReceiveWithCode(code: String, saveAsDefault: Boolean = false, engine: CrocEngine? = null) {
@@ -222,7 +269,7 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
             val existingDir = currentOutputDir?.takeIf { it.exists() && it.walkTopDown().any { f -> f.isFile } }
             val outputDir = existingDir ?: File(
                 getApplication<CrocApp>().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS),
-                "FeNyx/${System.currentTimeMillis()}"
+                "F3Nyx/${System.currentTimeMillis()}"
             ).apply { mkdirs() }
             currentOutputDir = outputDir
 
@@ -295,6 +342,14 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
         startReceive(CrocEngine.CURRENT)
     }
 
+    /** Wait for the next sender with the current panel code. */
+    private fun relistenPanel() {
+        if (publishing) return // still saving the last file; try on the next tick
+        panelTriedLegacy = false
+        _uiState.update { it.copy(activeEngine = CrocEngine.CURRENT) }
+        startReceive(CrocEngine.CURRENT)
+    }
+
     private fun panelTick() {
         if (!panelActive) return
         val now = System.currentTimeMillis()
@@ -310,8 +365,11 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
             is CrocTransferState.Transferring -> Unit // never interrupt a transfer
             is CrocTransferState.Completed -> {
                 panelFailures = 0
-                // Leave "Received!" on screen briefly, then wait for the next sender.
-                if (inState >= 6_000) issueNewPanelCode()
+                // Listen again almost at once with the SAME code, so a phone can send
+                // file after file without rescanning. The code still rotates on its timer.
+                if (inState >= 1_200) {
+                    if (codeAge >= PANEL_CODE_LIFETIME_MS) issueNewPanelCode() else relistenPanel()
+                }
             }
             is CrocTransferState.LegacyFallbackAvailable -> {
                 // The phone is on an older croc: retry the same code with the
@@ -409,7 +467,7 @@ class ReceiveViewModel(application: Application) : AndroidViewModel(application)
                 uri.lastPathSegment?.replace(":", "/") ?: "Custom folder"
             } catch (_: Exception) { "Custom folder" }
         } else {
-            "Downloads/FeNyx"
+            "Downloads/F3Nyx"
         }
     }
 

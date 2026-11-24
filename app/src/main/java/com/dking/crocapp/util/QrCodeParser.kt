@@ -108,14 +108,17 @@ object QrCodeParser {
      * Deep link shown by a panel that is waiting to RECEIVE: scanning it should
      * open the phone's Send screen with this code filled in.
      */
-    fun sendDeepLink(code: String): String {
+    /** [once]: a phone showing its QR, not a panel, so the sender shouldn't keep reusing the code. */
+    fun sendDeepLink(code: String, once: Boolean = false): String {
         val encodedCode = try {
             URLEncoder.encode(code.trim(), "UTF-8")
         } catch (_: Exception) {
             code.trim()
         }
-        return "croc://send?code=$encodedCode"
+        return "croc://send?code=$encodedCode" + if (once) "&once=1" else ""
     }
+
+    fun isOneTimeLink(input: String): Boolean = input.contains("once=1", ignoreCase = true)
 
     /** True when [input] is a panel's "send to me" link (croc://send?code=…). */
     fun isSendDeepLink(input: String): Boolean =

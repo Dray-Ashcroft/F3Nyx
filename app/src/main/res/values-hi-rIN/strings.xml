@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="app_name">FeNyx</string>
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">F3Nyx</string>
     <!-- ════ Common / General ════ -->
     <string name="action_cancel">रद्द करें</string>
     <string name="action_dismiss">हटाएं</string>
@@ -212,12 +212,12 @@
     <string name="settings_multicast_placeholder">239.255.255.250</string>
     <string name="settings_storage">स्टोरेज</string>
     <string name="settings_receive_location">सेव लोकेशन</string>
-    <string name="settings_receive_location_default">Downloads/FeNyx (डिफ़ॉल्ट)</string>
+    <string name="settings_receive_location_default">Downloads/F3Nyx (डिफ़ॉल्ट)</string>
     <string name="settings_receive_location_custom">कस्टम फ़ोल्डर</string>
     <string name="settings_choose_folder">फ़ोल्डर चुनें</string>
     <string name="settings_change_folder">बदलें</string>
     <string name="settings_reset_folder">रीसेट करें</string>
-    <string name="settings_receive_location_desc">प्राप्त फ़ाइलें कहाँ सहेजें। डिफ़ॉल्ट है Downloads/FeNyx।</string>
+    <string name="settings_receive_location_desc">प्राप्त फ़ाइलें कहाँ सहेजें। डिफ़ॉल्ट है Downloads/F3Nyx।</string>
     <string name="settings_about">के बारे में</string>
     <string name="settings_app_version">ऐप वर्शन</string>
     <string name="settings_croc_version">Croc वर्शन</string>
@@ -512,4 +512,109 @@
     <string name="receive_input_code_dialog_title">गुप्त कोड दर्ज करें</string>
     <string name="receive_input_code_dialog_desc">प्राप्त करना शुरू करने के लिए प्रेषक का गुप्त कोड वाक्यांश दर्ज करें।</string>
     <string name="receive_input_code_save_default">डिफ़ॉल्ट कोड वाक्यांश के रूप में सहेजें</string>
+
+    <!-- F3Nyx 7.x -->
+    <string name="panel_title">भेजने के लिए स्कैन करें</string>
+    <string name="panel_subtitle">अपने फ़ोन पर: भेजें → QR स्कैन करें → फ़ाइल चुनें</string>
+    <string name="panel_code_label">कोड</string>
+    <string name="panel_waiting">डिवाइस की प्रतीक्षा</string>
+    <string name="panel_connecting">नया कोड लिया जा रहा है…</string>
+    <string name="panel_received">प्राप्त हुआ</string>
+    <string name="panel_reconnecting">कनेक्शन टूट गया। नया कोड लिया जा रहा है…</string>
+    <string name="panel_new_code_in">%1$d मिनट में नया कोड</string>
+    <string name="panel_new_code_now">नया कोड</string>
+    <string name="panel_last_received">अंतिम प्राप्त</string>
+    <string name="send_scan_qr">QR स्कैन करें</string>
+    <string name="send_scan_panel_qr">QR स्कैन करें</string>
+    <string name="send_tap_to_pick_files">फ़ाइलें चुनने के लिए टैप करें</string>
+    <string name="send_tap_to_pick_folder">फ़ोल्डर चुनने के लिए टैप करें</string>
+    <string name="send_pick_hint">फ़ोटो, वीडियो, दस्तावेज़ — कुछ भी</string>
+    <string name="send_delivery_direct">सीधा</string>
+    <string name="send_delivery_store">स्टोर</string>
+    <string name="action_more_options">और विकल्प</string>
+    <string name="receive_scan_sender_qr">QR स्कैन करें</string>
+    <string name="receive_or_type">या कोड टाइप करें</string>
+    <string name="receive_hint">भेजने वाले डिवाइस से कोड या QR लें</string>
+    <string name="receive_clear_all">साफ़ करें</string>
+    <string name="mode_meko">Jarvis · फ़ोन</string>
+    <string name="mode_rimas">Friday · पैनल</string>
+    <string name="mode_dot_a11y">मोड: %1$s. बदलने के लिए दबाकर रखें।</string>
+    <string name="mode_summoned_meko">Jarvis ऑनलाइन</string>
+    <string name="mode_summoned_rimas">Friday ऑनलाइन</string>
+    <string name="settings_header_mode">F3Nyx · %1$s</string>
+    <string name="settings_effects_full">पूर्ण प्रभाव</string>
+    <string name="settings_effects_full_desc">मोड बदलने और गेज की एनिमेशन। शांत और तेज़ ऐप के लिए बंद करें।</string>
+    <string name="menu_use_legacy_engine">पुराना इंजन उपयोग करें</string>
+    <string name="menu_use_latest_engine">नवीनतम इंजन उपयोग करें</string>
+    <string name="action_share_all">सब साझा करें</string>
+    <string name="action_open_folder">फ़ोल्डर</string>
+    <string name="notif_channel_progress">ट्रांसफ़र प्रगति</string>
+    <string name="notif_channel_done">पूर्ण ट्रांसफ़र</string>
+    <string name="notif_transmitting">भेजा जा रहा है</string>
+    <string name="notif_retrieving">प्राप्त हो रहा है</string>
+    <string name="notif_of">%2$s में से %1$s</string>
+    <string name="notif_sent_size">%1$s भेजा गया</string>
+    <string name="notif_saved_to">Downloads/F3Nyx में सहेजा गया · %1$s</string>
+    <string name="notif_open">खोलें</string>
+    <string name="notif_share">साझा करें</string>
+    <string name="notif_eta_seconds">%1$d सेकंड बाकी</string>
+    <string name="notif_eta_minutes">%1$d मिनट बाकी</string>
+    <string name="notif_eta_hours">%1$d घं %2$d मिनट बाकी</string>
+    <string name="mode_short_meko">Jarvis</string>
+    <string name="mode_short_rimas">Friday</string>
+    <string name="mode_header_a11y">%1$s, %2$s. मोड बदलने के लिए दबाकर रखें।</string>
+    <string name="gauge_connecting">कनेक्ट हो रहा है</string>
+    <string name="gauge_sending">भेजा जा रहा है</string>
+    <string name="gauge_receiving">प्राप्त हो रहा है</string>
+    <string name="gauge_done">पूर्ण</string>
+    <string name="stat_speed">गति</string>
+    <string name="stat_sent">भेजा</string>
+    <string name="stat_received">प्राप्त</string>
+    <string name="stat_left">बाकी</string>
+    <string name="panel_pill_ready">तैयार · %1$d मिनट</string>
+    <string name="panel_pill_receiving">प्राप्त हो रहा है</string>
+    <string name="panel_big_qr">बड़ा QR</string>
+    <string name="panel_animation_on">एनिमेशन चालू</string>
+    <string name="panel_animation_off">एनिमेशन बंद</string>
+    <string name="panel_ready_next">अगली फ़ाइल के लिए तैयार · वही कोड</string>
+    <string name="panel_steps_title">इस बोर्ड पर भेजें</string>
+    <string name="panel_step_1">अपने फ़ोन पर F3Nyx खोलें, फिर भेजें</string>
+    <string name="panel_step_2">पैनल QR स्कैन करें पर टैप करें और कोड की ओर रखें</string>
+    <string name="panel_step_3">फ़ाइलें चुनें और भेजें। कभी भी फिर भेजें</string>
+    <string name="panel_received_today">आज प्राप्त</string>
+    <string name="panel_tab_files">फ़ाइलें · %1$d</string>
+    <string name="panel_tab_text">टेक्स्ट · %1$d</string>
+    <string name="panel_none_files">इस बोर्ड पर भेजी गई फ़ाइलें यहाँ दिखती हैं।</string>
+    <string name="panel_none_text">इस बोर्ड पर भेजा गया टेक्स्ट यहाँ दिखता है।</string>
+    <string name="panel_copy_text">टेक्स्ट कॉपी करें</string>
+    <string name="panel_scan_with">F3Nyx से स्कैन करें</string>
+    <string name="layout_phone">फ़ोन लेआउट</string>
+    <string name="layout_panel">पैनल लेआउट</string>
+    <string name="theme_monet">Monet (वॉलपेपर रंग)</string>
+    <string name="theme_monet_desc">एक्सेंट रंग आपके वॉलपेपर से आते हैं। पृष्ठभूमि तटस्थ रहती है; लाइट या डार्क फ़ोन के अनुसार।</string>
+    <string name="panel_waiting_hint">भेजने के लिए F3Nyx से QR स्कैन करें</string>
+    <string name="panel_help_show">इस बोर्ड पर कैसे भेजें</string>
+    <string name="panel_help_hide">चरण छिपाएँ</string>
+    <!-- A label beside a large number, not a sentence: same word for 0, 1 and more. -->
+    <plurals name="big_files" tools:ignore="ImpliedQuantity">
+        <item quantity="one">फ़ाइल</item>
+        <item quantity="other">फ़ाइलें</item>
+    </plurals>
+    <plurals name="notif_retrieved">
+        <item quantity="one">प्राप्त · %1$d फ़ाइल</item>
+        <item quantity="other">प्राप्त · %1$d फ़ाइलें</item>
+    </plurals>
+    <plurals name="notif_transmitted">
+        <item quantity="one">भेजा गया · %1$d फ़ाइल</item>
+        <item quantity="other">भेजी गईं · %1$d फ़ाइलें</item>
+    </plurals>
+    <string name="receive_show_qr">QR दिखाएँ</string>
+    <string name="receive_hint_show">यह फ़ोन QR दिखाता है और इंतज़ार करता है। भेजने वाला इसे Transmit से स्कैन करता है।</string>
+    <string name="receive_hint_scan">भेजने वाला QR दिखाता है; इसे इस फ़ोन से स्कैन करें।</string>
+    <string name="receive_qr_help_show">ये बटन क्या करते हैं</string>
+    <string name="receive_qr_help_hide">मदद छिपाएँ</string>
+    <string name="receive_qr_waiting">भेजने वाले का इंतज़ार…</string>
+    <string name="receive_qr_steps">भेजने वाले फ़ोन पर: Transmit → फ़ाइलें चुनें → QR स्कैन करें। ट्रांसफ़र शुरू होते ही यह अपने-आप बंद हो जाएगा।</string>
+    <string name="receive_qr_title">प्राप्त करें</string>
+    <string name="receive_code_copied">कोड कॉपी हुआ</string>
 </resources>

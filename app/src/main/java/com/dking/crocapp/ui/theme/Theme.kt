@@ -117,14 +117,18 @@ private val ExpressiveShapes = Shapes(
     extraLarge = RoundedCornerShape(32.dp)
 )
 
+/** True when the Monet theme is active: brand accents follow the wallpaper. */
+val LocalMonet = androidx.compose.runtime.staticCompositionLocalOf { false }
+
 @Composable
 fun CrocTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     amoledDark: Boolean = false,
+    monet: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
+    val baseScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             val base = if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
@@ -148,10 +152,31 @@ fun CrocTheme(
         else -> LightColorScheme
     }
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = CrocTypography,
-        shapes = ExpressiveShapes,
-        content = content
-    )
+    // Monet: accents from the wallpaper, backgrounds and surfaces stay F3Nyx's own
+    // neutral greys, so the app keeps its calm, professional look.
+    val colorScheme = if (monet && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val context = LocalContext.current
+        val w = if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+        baseScheme.copy(
+            primary = w.primary, onPrimary = w.onPrimary,
+            primaryContainer = w.primaryContainer, onPrimaryContainer = w.onPrimaryContainer,
+            secondary = w.secondary, onSecondary = w.onSecondary,
+            secondaryContainer = w.secondaryContainer, onSecondaryContainer = w.onSecondaryContainer,
+            tertiary = w.tertiary, onTertiary = w.onTertiary,
+            tertiaryContainer = w.tertiaryContainer, onTertiaryContainer = w.onTertiaryContainer,
+            inversePrimary = w.inversePrimary,
+            surfaceTint = w.primary
+        )
+    } else baseScheme
+
+    androidx.compose.runtime.CompositionLocalProvider(
+        LocalMonet provides (monet && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+    ) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            typography = CrocTypography,
+            shapes = ExpressiveShapes,
+            content = content
+        )
+    }
 }
