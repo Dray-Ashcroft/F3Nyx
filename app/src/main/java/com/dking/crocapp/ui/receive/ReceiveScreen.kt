@@ -910,7 +910,8 @@ private fun QrRoundButton(
             color = gold.copy(alpha = if (enabled) 0.14f else 0.06f),
             contentColor = if (enabled) gold else gold.copy(alpha = 0.4f),
             border = androidx.compose.foundation.BorderStroke(1.dp, gold.copy(alpha = if (enabled) 0.32f else 0.12f)),
-            modifier = Modifier.size(58.dp)
+            // The label sits below; screen readers still hear the button's name.
+            modifier = Modifier.size(58.dp).semantics { contentDescription = label }
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
@@ -979,6 +980,13 @@ private fun ShowQrDialog(code: String, onNewCode: () -> Unit, onCopy: () -> Unit
         onDismissRequest = onClose,
         properties = androidx.compose.ui.window.DialogProperties(usePlatformDefaultWidth = false)
     ) {
+        ShowQrContent(code, onNewCode, onCopy, onClose)
+    }
+}
+
+@Composable
+internal fun ShowQrContent(code: String, onNewCode: () -> Unit, onCopy: () -> Unit, onClose: () -> Unit) {
+    run {
         androidx.compose.material3.Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.surface) {
             androidx.compose.foundation.layout.BoxWithConstraints(Modifier.fillMaxSize()) {
                 val qr = minOf(maxWidth - 96.dp, maxHeight * 0.42f, 320.dp)

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="F3Nyx — Simple, private file sharing" width="100%">
+  <img src="assets/banner/banner.png" alt="F3Nyx — Simple, private file sharing" width="100%">
 </p>
 
 <h1 align="center">F3Nyx (Phoenix)</h1>
@@ -44,12 +44,18 @@ F3Nyx lets you send files, folders or text from one phone, tablet or computer to
 
 F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and on the Android app made by [Dking08](https://github.com/Dking08). It rose from Kroc-Sauria and Crovan, hence the name: a phoenix.
 
+<p align="center">
+  <img src="assets/about.png" alt="F3Nyx on a smart panel and a phone" width="100%">
+</p>
+
 <table width="100%">
   <tr>
-    <td width="25%" align="center"><h3>0</h3><sub>accounts needed</sub></td>
-    <td width="25%" align="center"><h3>10 GB+</h3><sub>files, without crashing</sub></td>
-    <td width="25%" align="center"><h3>2</h3><sub>layouts: phone and smart board</sub></td>
-    <td width="25%" align="center"><h3>5</h3><sub>languages</sub></td>
+    <td width="50%" align="center"><h3>0</h3><sub>accounts needed</sub></td>
+    <td width="50%" align="center"><h3>10 GB+</h3><sub>files, without crashing</sub></td>
+  </tr>
+  <tr>
+    <td width="50%" align="center"><h3>2</h3><sub>layouts: phone and smart board</sub></td>
+    <td width="50%" align="center"><h3>5</h3><sub>languages</sub></td>
   </tr>
 </table>
 
@@ -57,25 +63,13 @@ F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and
 
 ## How It Works
 
-<table width="100%">
-  <tr>
-    <td width="33%" align="center">
-      <h3>01</h3>
-      <b>Pick</b><br>
-      <sub>Choose files, a folder or text on the sending device</sub>
-    </td>
-    <td width="33%" align="center">
-      <h3>02</h3>
-      <b>Share the code</b><br>
-      <sub>Show the QR or read out the short code</sub>
-    </td>
-    <td width="33%" align="center">
-      <h3>03</h3>
-      <b>Receive</b><br>
-      <sub>Scan or type it on the other device. Done.</sub>
-    </td>
-  </tr>
-</table>
+<p align="center">
+  <img src="assets/how-it-works.png" alt="01 Pick files, 02 share the code with Show QR, 03 receive" width="100%">
+</p>
+
+1. **Pick** — choose files, a folder or text on the sending device.
+2. **Share the code** — show the QR on either phone, or read out the short code.
+3. **Receive** — scan with **Scan QR** or type the code. Done.
 
 ---
 
@@ -84,21 +78,21 @@ F3Nyx is built on a free tool called [croc](https://github.com/schollz/croc) and
 <table width="100%">
   <tr>
     <td width="50%" align="center">
-      <img src="Screenshots/Phone.png" alt="Phone layout with the Transmit screen" width="85%">
+      <img src="assets/screenshots/Phone.png" alt="Phone layout with the Transmit screen" width="85%">
       <br><sub><b>1 · Phone layout</b></sub>
     </td>
     <td width="50%" align="center">
-      <img src="Screenshots/Panel.png" alt="Panel layout with a large QR code" width="85%">
+      <img src="assets/screenshots/Panel.png" alt="Panel layout with a large QR code" width="85%">
       <br><sub><b>2 · Panel layout</b></sub>
     </td>
   </tr>
   <tr>
     <td width="50%" align="center">
-      <img src="Screenshots/Transmit.png" alt="Transmit screen while sending" width="85%">
+      <img src="assets/screenshots/Transmit.png" alt="Transmit screen while sending" width="85%">
       <br><sub><b>3 · Transmit (Send)</b></sub>
     </td>
     <td width="50%" align="center">
-      <img src="Screenshots/Retrieve.png" alt="Retrieve screen for receiving" width="85%">
+      <img src="assets/screenshots/Retrieve.png" alt="Retrieve screen for receiving" width="85%">
       <br><sub><b>4 · Retrieve (Receive)</b></sub>
     </td>
   </tr>
